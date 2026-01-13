@@ -5,7 +5,7 @@ import { VehicleSale } from '../models/vehicle-sale.model';
 
 @Injectable({ providedIn: 'root' })
 export class SaleService {
-  private apiUrl = 'http://localhost:8080/api'; // Assuming backend endpoint
+  private apiUrl = 'https://allcity-transport-erp.onrender.com/api'; // Assuming backend endpoint
   private localStorageKey = 'vehicleSales';
 
   constructor(private http: HttpClient) {}
@@ -15,9 +15,9 @@ export class SaleService {
     // Try backend first, fallback to local storage
     console.log('Just before selling vehicle call');
 
-  
+
       return this.http.post(`${this.apiUrl}/vehicle-sales`, sale);
-  
+
 
     // this.http.post<VehicleSale>(`${this.apiUrl}`, sale).subscribe({
     //   next: () => {},

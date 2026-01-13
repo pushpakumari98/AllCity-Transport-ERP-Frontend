@@ -8,7 +8,7 @@ import { Employee, Department } from './admin.model';
 })
 export class AdminService {
 
-  private base = 'http://localhost:8080/api/admin';
+  private base = 'https://allcity-transport-erp.onrender.com/api/admin';
 
   constructor(private http: HttpClient) {}
 

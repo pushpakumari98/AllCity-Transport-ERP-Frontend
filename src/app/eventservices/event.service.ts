@@ -9,7 +9,7 @@ import { BookingStatus } from '../enums/booking-status.enum';
   providedIn: 'root'
 })
 export class EventService {
-  private baseUrl = 'http://localhost:8080/api/events';
+  private baseUrl = 'https://allcity-transport-erp.onrender.com/api/events';
 
   constructor(private http: HttpClient) {}
 

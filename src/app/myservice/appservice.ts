@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class Appservice {
 
-  private baseUrl = 'http://localhost:8080/api/bookings';
+  private baseUrl = 'https://allcity-transport-erp.onrender.com/api/bookings';
 
   constructor(
     private http: HttpClient,
@@ -17,12 +17,12 @@ export class Appservice {
 
   // USER REGISTRATION
   registerUser(data: any): Observable<any> {
-    return this.http.post(`http://localhost:8080/api/auth/register`, data);
+    return this.http.post(`https://allcity-transport-erp.onrender.com/api/auth/register`, data);
   }
 
   // USER LOGIN
   login(data: any): Observable<any> {
-    return this.http.post(`http://localhost:8080/api/auth/login`, data);
+    return this.http.post(`https://allcity-transport-erp.onrender.com/api/auth/login`, data);
   }
 
   // Snackbar for login error
@@ -41,7 +41,7 @@ export class Appservice {
 
   // FETCH ALL BOOKINGS
   getBookedVehicles() {
-  return this.http.get<any[]>('http://localhost:8080/all/bookings');
+  return this.http.get<any[]>('http://all/bookings');
 }
 
 

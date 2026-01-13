@@ -6,7 +6,7 @@ import { Driver } from '../models/driver.model';
 @Injectable({ providedIn: 'root' })
 export class DriverService {
   private storageKey = 'drivers';
-  private apiUrl = 'http://localhost:8080/api/drivers'; // Assuming backend endpoint
+  private apiUrl = 'https://allcity-transport-erp.onrender.com/api/drivers'; // Assuming backend endpoint
 
   constructor(private http: HttpClient) {}
 

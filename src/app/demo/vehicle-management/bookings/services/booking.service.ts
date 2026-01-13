@@ -6,7 +6,7 @@ import { Vehicle } from '../models/vehicle-booking.model';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
-  private apiUrl = 'http://localhost:8080/api'; 
+  private apiUrl = 'https://allcity-transport-erp.onrender.com/api';
   private bookingsUrl = `${this.apiUrl}/bookings`;
   private vehiclesUrl = `${this.apiUrl}/vehicles`;
 

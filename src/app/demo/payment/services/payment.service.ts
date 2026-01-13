@@ -7,7 +7,7 @@ import { Payment } from '../models/payment.model';
   providedIn: 'root'
 })
 export class PaymentService {
-  private apiUrl = 'http://localhost:8080/api/payments'; // Backend API URL
+  private apiUrl = 'https://allcity-transport-erp.onrender.com/api/payments'; // Backend API URL
   private localStorageKey = 'payments';
 
   constructor(private http: HttpClient) {}
