@@ -78,7 +78,7 @@ export class PurchaseComponent implements OnInit {
         // this.notificationService.notifyPurchase(response || payload);
 
         this.purchaseForm.reset();
-        this.router.navigate(['/purchase-list']);
+        this.router.navigate(['/app/purchase-list']);
       },
 
       error: (error) => {
@@ -97,7 +97,7 @@ export class PurchaseComponent implements OnInit {
         // this.notificationService.notifyPurchase(payload);
 
         this.purchaseForm.reset();
-        this.router.navigate(['/purchase-list']);
+        this.router.navigate(['/app/purchase-list']);
       }
     });
   }
@@ -122,6 +122,6 @@ export class PurchaseComponent implements OnInit {
   }
 
   viewPurchasesList() {
-    this.router.navigate(['/purchase-list']);
+    this.router.navigate(['/app/purchase-list']);
   }
 }

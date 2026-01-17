@@ -183,7 +183,7 @@ export class NavRightComponent implements OnInit, OnDestroy {
 
     // Navigate to login page
     setTimeout(() => {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/login']);
     }, 1000);
   }
 }

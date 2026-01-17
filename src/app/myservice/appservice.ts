@@ -25,6 +25,16 @@ export class Appservice {
     return this.http.post(`https://allcity-transport-erp.onrender.com/api/auth/login`, data);
   }
 
+  // Check if user is authenticated
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  // Logout user
+  logout(): void {
+    localStorage.removeItem('token');
+  }
+
   // Snackbar for login error
   showAutoCloseAlert() {
     this.snackBar.open('Login failed!', '', {

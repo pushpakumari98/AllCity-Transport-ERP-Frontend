@@ -28,7 +28,7 @@ export const NavigationItems: NavigationItem[] = [
         id: 'dashboard',
         title: 'Dashboard',
         type: 'item',
-        url: '/dashboard',
+        url: '/app/dashboard',
         icon: 'feather icon-home',
         classes: 'nav-item'
       }
@@ -48,7 +48,7 @@ export const NavigationItems: NavigationItem[] = [
         id: 'events',
         title: 'Events',
         type: 'item',
-        url: '/events',
+        url: '/app/events',
         icon: 'feather icon-file-text'
       }
     ]
@@ -73,19 +73,19 @@ export const NavigationItems: NavigationItem[] = [
             id: 'admin-management',
             title: 'Admin Management',
             type: 'item',
-            url: '/admin-management'
+            url: '/app/admin-management'
           },
           {
             id: 'employee-management',
             title: 'Employee Management',
             type: 'item',
-            url: '/employee-management'
+            url: '/app/employee-management'
           },
           {
             id: 'hr-payroll-management',
             title: 'HR Payroll Management',
             type: 'item',
-            url: '/hr-payroll-management'
+            url: '/app/hr-payroll-management'
           }
         ]
       }
@@ -111,31 +111,31 @@ export const NavigationItems: NavigationItem[] = [
             id: 'add-vehicle',
             title: 'Add Vehicle',
             type: 'item',
-            url: '/add-vehicle'
+            url: '/app/add-vehicle'
           },
           {
             id: 'bookings',
             title: 'Bookings',
             type: 'item',
-            url: '/bookings'
+            url: '/app/bookings'
           },
           {
             id: 'sales',
             title: 'Sale',
             type: 'item',
-            url: '/sale'
+            url: '/app/sale'
           },
           {
             id: 'drivers',
             title: 'Drivers',
             type: 'item',
-            url: '/drivers'
+            url: '/app/drivers'
           },
           {
             id: 'purchase',
             title: 'Purchase',
             type: 'item',
-            url: '/purchases'
+            url: '/app/purchases'
           }
         ]
       }
@@ -161,31 +161,31 @@ export const NavigationItems: NavigationItem[] = [
             id: 'vehicle-booking-report',
             title: 'Vehicle Booking Report',
             type: 'item',
-            url: '/vehicle-booking-reports'
+            url: '/app/vehicle-booking-reports'
           },
           {
             id: 'vehicle-sales-report',
             title: 'Vehicle Sales Report',
             type: 'item',
-            url: '/vehicle-sales-reports'
+            url: '/app/vehicle-sales-reports'
           },
           {
             id: 'vehicle-purchase-report',
             title: 'Vehicle Purchase Report',
             type: 'item',
-            url: '/vehicle-purchase-reports'
+            url: '/app/vehicle-purchase-reports'
           },
           {
             id: 'driver-report',
             title: 'Driver Report',
             type: 'item',
-            url: '/driver-reports'
+            url: '/app/driver-reports'
           },
           {
             id: 'employee-report',
             title: 'Employee Report',
             type: 'item',
-            url: '/employee-reports'
+            url: '/app/employee-reports'
           }
         ]
       }
@@ -211,7 +211,7 @@ export const NavigationItems: NavigationItem[] = [
             id: 'signup',
             title: 'Sign Up',
             type: 'item',
-            url: '/register',
+            url: '/auth/register',
             target: true,
             breadcrumbs: false
           },
@@ -219,7 +219,7 @@ export const NavigationItems: NavigationItem[] = [
             id: 'signin',
             title: 'Sign In',
             type: 'item',
-            url: '/login',
+            url: '/auth/login',
             target: true,
             breadcrumbs: false
           }

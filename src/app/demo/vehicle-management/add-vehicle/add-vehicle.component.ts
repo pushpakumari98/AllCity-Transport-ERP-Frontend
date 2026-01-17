@@ -134,7 +134,7 @@ export class AddVehicleComponent implements OnInit {
           panelClass: 'success-snackbar'
         });
         this.isSubmitting = false;
-        this.router.navigate(['/vehicle-list']); // Redirect to vehicle list
+        this.router.navigate(['/app/vehicle-list']); // Redirect to vehicle list
       },
       error: (error) => {
         console.error('Error adding vehicle:', error);
@@ -186,6 +186,6 @@ export class AddVehicleComponent implements OnInit {
   }
 
   goToVehicleList(): void {
-    this.router.navigate(['/vehicle-list']);
+    this.router.navigate(['/app/vehicle-list']);
   }
 }

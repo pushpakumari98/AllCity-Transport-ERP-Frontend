@@ -5,21 +5,41 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminComponent } from './theme/layout/admin/admin.component';
 import { GuestComponent } from './theme/layout/guest/guest.component';
 
+// Guards
+import { AuthGuard, GuestGuard } from './shared/services/auth.guard';
+
 // Components
 import { AdminComponent as AdminManagementComponent } from './demo/admin-management/admin.component'; // <-- Your AdminManagement page
 import { EventComponent } from './demo/event-management/events/event/event.component';
 
 const routes: Routes = [
-  // Authenticated layout
+  // Default route - redirect to login
+  { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
+
+  // Guest layout (login/register) - accessible only to non-authenticated users
   {
-    path: '',
-    component: AdminComponent,
+    path: 'auth',
+    component: GuestComponent,
+    canActivate: [GuestGuard],
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
-        path: 'dashboard',
-        loadComponent: () => import('./demo/dashboard/dashboard.component').then(c => c.DashboardComponent)
+        path: 'login',
+        loadComponent: () => import('./demo/pages/authentication/auth-signin/auth-signin.component').then(c => c.AuthSigninComponent)
       },
+      {
+        path: 'register',
+        loadComponent: () => import('./demo/pages/authentication/auth-signup/auth-signup.component').then(c => c.AuthSignupComponent)
+      }
+    ]
+  },
+
+  // Authenticated routes - protected by AuthGuard
+  {
+    path: 'app',
+    component: AdminComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'dashboard', loadComponent: () => import('./demo/dashboard/dashboard.component').then(c => c.DashboardComponent) },
       {
         path: 'basic',
         loadChildren: () => import('./demo/ui-elements/ui-basic/ui-basic.module').then(m => m.UiBasicModule)
@@ -140,24 +160,8 @@ const routes: Routes = [
     ]
   },
 
-  // Guest layout (login/register)
-  {
-    path: '',
-    component: GuestComponent,
-    children: [
-      {
-        path: 'login',
-        loadComponent: () => import('./demo/pages/authentication/auth-signin/auth-signin.component').then(c => c.AuthSigninComponent)
-      },
-      {
-        path: 'register',
-        loadComponent: () => import('./demo/pages/authentication/auth-signup/auth-signup.component').then(c => c.AuthSignupComponent)
-      }
-    ]
-  },
-
-  // Catch-all redirect
-  { path: '**', redirectTo: '' }
+  // Catch-all redirect to login
+  { path: '**', redirectTo: '/auth/login' }
 ];
 
 @NgModule({

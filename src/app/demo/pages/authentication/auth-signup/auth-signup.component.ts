@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Appservice } from 'src/app/myservice/appservice';
@@ -11,7 +11,7 @@ import { Appservice } from 'src/app/myservice/appservice';
   templateUrl: './auth-signup.component.html',
   styleUrls: ['./auth-signup.component.scss']
 })
-export class AuthSignupComponent {
+export class AuthSignupComponent implements OnInit {
   email: string = '';
   password: string = '';
   firstName: string = '';
@@ -23,6 +23,13 @@ export class AuthSignupComponent {
 
   error: any = null;
   constructor(private myService: Appservice, private router: Router) {}
+
+  ngOnInit() {
+    // If user is already authenticated, redirect to dashboard
+    if (this.myService.isAuthenticated()) {
+      this.router.navigate(['/app/dashboard']);
+    }
+  }
 
 onSignup() {
 
@@ -40,12 +47,12 @@ onSignup() {
 
       if (res.status === 200) {
         alert('Registration successful! Please log in with your credentials.');
-        this.router.navigate(['/login']); // ✅ correct redirect
+        this.router.navigate(['/auth/login']); // ✅ correct redirect
       }
 
       if (res.status === 409) {
         alert('Welcome back! An account with this email already exists. Please sign in to continue.');
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth/login']);
       }
     },
     error: (err) => {

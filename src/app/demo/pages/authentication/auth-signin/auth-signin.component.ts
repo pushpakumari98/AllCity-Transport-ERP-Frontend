@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
@@ -17,7 +17,7 @@ import { Appservice } from 'src/app/myservice/appservice';
   ]
 
 })
-export class AuthSigninComponent {
+export class AuthSigninComponent implements OnInit {
   loginData = {
     email: '',
     password: ''
@@ -27,6 +27,13 @@ export class AuthSigninComponent {
 
   constructor(private myService: Appservice, private router: Router,private snackBar: MatSnackBar
 ) {}
+
+  ngOnInit() {
+    // If user is already authenticated, redirect to dashboard
+    if (this.myService.isAuthenticated()) {
+      this.router.navigate(['/app/dashboard']);
+    }
+  }
 
   onSignUp(){
     alert('alert');
@@ -50,7 +57,7 @@ export class AuthSigninComponent {
           localStorage.setItem('token', res.token);
         }
 
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/app/dashboard']);
       },
       error: (err) => {
         console.log(err);

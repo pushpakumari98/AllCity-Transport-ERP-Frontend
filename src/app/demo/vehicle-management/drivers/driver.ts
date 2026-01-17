@@ -59,7 +59,7 @@ export class DriverComponent {
         // Trigger notification
         this.notificationService.notifyDriverAdded(payload);
 
-        this.router.navigate(['/drivers-list']);
+        this.router.navigate(['/app/drivers-list']);
       },
 
       error: () => {
@@ -73,6 +73,6 @@ export class DriverComponent {
   }
 
   viewDriversList() {
-    this.router.navigate(['/drivers-list']);
+    this.router.navigate(['/app/drivers-list']);
   }
 }

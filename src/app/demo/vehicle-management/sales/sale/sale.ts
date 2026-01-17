@@ -67,7 +67,7 @@ export class SaleComponent implements OnInit {
               verticalPosition: 'top',
               horizontalPosition: 'center'
             });
-            this.router.navigate(['/vehicle-sales-list']);
+            this.router.navigate(['/app/vehicle-sales-list']);
           },
           error => {
             console.error('Error updating sale:', error);
@@ -182,11 +182,11 @@ export class SaleComponent implements OnInit {
       default:
         // Fallback to sales list if payment mode is unknown
         console.warn('Unknown payment mode:', paymentMode, 'redirecting to sales list');
-        this.router.navigate(['/vehicle-sales-list']);
+        this.router.navigate(['/app/vehicle-sales-list']);
     }
   }
 
   viewSoldVehiclesList() {
-    this.router.navigate(['/vehicle-sales-list']);
+    this.router.navigate(['/app/vehicle-sales-list']);
   }
 }

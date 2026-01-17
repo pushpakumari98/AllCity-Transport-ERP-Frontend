@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { BookingService } from 'src/app/demo/vehicle-management/bookings/services/booking.service';
-import { NotificationService } from 'src/app/shared/services/notification.service'; 
+import { NotificationService } from 'src/app/shared/services/notification.service';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { VehicleType } from '../../../../enums/vehicle-type.enum';
 import { VehicleStatus } from '../../../../enums/vehicle-status.enum';
@@ -163,7 +163,7 @@ export class Booking implements OnInit {
           horizontalPosition: 'center',
           panelClass: 'success-snackbar'
         });
-        this.router.navigate(['/booked-vehicles']);
+        this.router.navigate(['/app/booked-vehicles']);
       },
       error: (error) => {
         console.error('Backend not available, saving to localStorage:', error);
@@ -184,7 +184,7 @@ export class Booking implements OnInit {
   }
 
   viewBookedVehicles() {
-    this.router.navigate(['/booked-vehicles']);
+    this.router.navigate(['/app/booked-vehicles']);
   }
 
   private saveNewBookingToStorage(booking: any) {
