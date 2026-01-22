@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -65,7 +65,7 @@ export class EventComponent implements OnInit {
     endDate: ''
   };
 
-  constructor(private service: EventService, private notificationService: NotificationService) {}
+  constructor(private service: EventService, private notificationService: NotificationService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadEvents();
@@ -79,14 +79,9 @@ export class EventComponent implements OnInit {
           color: this.getColor(e)
         }));
 
+        // Update only the events array, keep other options the same
         this.calendarOptions = {
-          plugins: [dayGridPlugin, interactionPlugin],
-          initialView: 'dayGridMonth',
-          headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,dayGridWeek,dayGridDay'
-          },
+          ...this.calendarOptions,
           events: res.map(e => {
             // Build title with visual indicators
             let title = e.title;
@@ -112,9 +107,7 @@ export class EventComponent implements OnInit {
                 isVehicleUpdate: e.isVehicleUpdate
               }
             };
-          }),
-          dateClick: this.handleDateClick.bind(this),
-          eventClick: this.openEdit.bind(this)
+          })
         };
       },
       error: (error) => {
@@ -185,6 +178,7 @@ export class EventComponent implements OnInit {
       this.form = formData;
       this.editMode = true;
       this.showModal = true;
+      this.cdr.detectChanges(); // Trigger change detection to update form fields
     }
   }
 
@@ -213,7 +207,9 @@ export class EventComponent implements OnInit {
 
     if (this.editMode) {
       console.log('Updating event with ID:', this.form.id);
-      this.service.update(this.form.id!, formData).subscribe({
+      // Remove id from formData since it's sent as path parameter
+      const { id, ...updateData } = formData;
+      this.service.update(this.form.id!, updateData).subscribe({
         next: (result) => {
           console.log('Update successful:', result);
           console.log('Calling notifyEventUpdated with:', { title: this.form.title, id: this.form.id });

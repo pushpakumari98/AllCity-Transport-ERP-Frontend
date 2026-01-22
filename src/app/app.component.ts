@@ -21,9 +21,6 @@ export class AppComponent implements OnInit {
 
   // life cycle hook
   ngOnInit() {
-    // Clear authentication token on app start to require fresh login
-    this.appService.logout();
-
     this.router.events.subscribe((evt) => {
       if (!(evt instanceof NavigationEnd)) {
         return;

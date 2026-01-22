@@ -87,7 +87,7 @@ export class VehicleListComponent implements OnInit {
   }
 
   addNewVehicle(): void {
-    this.router.navigate(['/add-vehicle']);
+    this.router.navigate(['/app/add-vehicle']);
   }
 
   editVehicle(vehicle: Vehicle): void {
