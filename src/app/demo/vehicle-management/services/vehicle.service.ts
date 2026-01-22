@@ -31,8 +31,8 @@ export class VehicleService {
       capacity: vehicle.capacity,
       description: vehicle.description,
       originCity: vehicle.originCity,
-      destinationCity: vehicle.destinationCity
-      // Note: Image upload will be handled separately or when backend supports it
+      destinationCity: vehicle.destinationCity,
+      vehicleStatus: vehicle.vehicleStatus
     };
 
     return this.http.post<Vehicle>(`${this.vehiclesUrl}/add-vehicle`, vehicleData, { headers: this.getHeaders() });
