@@ -156,18 +156,6 @@ export class VehicleListComponent implements OnInit {
     }
   }
 
-  onImageError(event: any): void {
-    // Hide the broken image and show fallback
-    event.target.style.display = 'none';
-    const parent = event.target.parentElement;
-    if (parent) {
-      const fallback = parent.querySelector('.text-muted');
-      if (fallback) {
-        fallback.style.display = 'block';
-      }
-    }
-  }
-
   // Export methods
   exportToCSV() {
     console.log('Export to CSV called', this.vehicles.length);

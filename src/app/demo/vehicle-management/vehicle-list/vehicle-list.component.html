@@ -4,14 +4,14 @@
       <h2 class="mb-0" style="color: black;">Vehicle List</h2>
 
 
-     
+
       <div class="d-flex gap-2">
         <!-- Add New Button -->
         <button type="button" class="btn btn-success btn-sm" (click)="addNewVehicle()">
           <i class="fa fa-plus me-2"></i>Add New Vehicle
         </button>
-       
-       
+
+
         <!-- Export Dropdown -->
         <div class="btn-group" ngbDropdown>
           <button type="button" class="btn btn-primary btn-sm dropdown-toggle" ngbDropdownToggle>
@@ -64,7 +64,6 @@
               <th style="background-color: #f8f9fa;">Destination City</th>
               <th style="background-color: #e9ecef;">Status</th>
               <th style="background-color: #f8f9fa;">Description</th>
-              <th style="background-color: #e9ecef;">Image</th>
               <th style="background-color: #f8f9fa;">Action</th>
             </tr>
           </thead>
@@ -87,17 +86,6 @@
                 <span class="badge" [ngClass]="getStatusBadgeClass(vehicle.vehicleStatus)">{{ vehicle.vehicleStatus || 'AVAILABLE' }}</span>
               </td>
               <td class="text-center">{{ vehicle.description || '-' }}</td>
-              <td class="text-center">
-                <img *ngIf="vehicle.imageUrl"
-                     [src]="'http://localhost:8080' + vehicle.imageUrl"
-                     alt="Vehicle Image"
-                     class="img-thumbnail"
-                     style="width: 60px; height: 60px; object-fit: cover;"
-                     (error)="onImageError($event)">
-                <div *ngIf="!vehicle.imageUrl" class="text-muted small">
-                  <i class="fa fa-image"></i><br>
-                </div>
-              </td>
               <td class="text-center">
                 <button class="btn btn-sm btn-warning me-2"
                         (click)="editVehicle(vehicle)"

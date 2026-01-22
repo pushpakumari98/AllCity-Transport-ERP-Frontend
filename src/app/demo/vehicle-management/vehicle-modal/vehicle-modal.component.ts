@@ -26,7 +26,6 @@ export class VehicleModalComponent implements OnInit {
   @Output() vehicleSaved = new EventEmitter<any>();
 
   vehicleForm!: FormGroup;
-  selectedFile: File | null = null;
 
   // Enum options for dropdowns
   permitLevelOptions = Object.values(PermitLevel);
@@ -80,34 +79,7 @@ export class VehicleModalComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        this.snackBar.open('Please select a valid image file!', '', {
-          duration: 3000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center',
-          panelClass: 'error-snackbar'
-        });
-        return;
-      }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.snackBar.open('Image size should not exceed 5MB!', '', {
-          duration: 3000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center',
-          panelClass: 'error-snackbar'
-        });
-        return;
-      }
-
-      this.selectedFile = file;
-    }
-  }
 
   saveVehicle() {
     if (this.vehicleForm.invalid) {
@@ -118,27 +90,21 @@ export class VehicleModalComponent implements OnInit {
     const formValue = this.vehicleForm.value;
 
     if (this.editMode && this.vehicleData) {
-      // For edit mode - send individual form fields
-      const formData = new FormData();
+      // For edit mode - use JSON update method
+      const vehicleData = {
+        vehicleRegNo: formValue.vehicleRegNo,
+        permitLevel: formValue.permitLevel,
+        driverMob: formValue.driverMob,
+        vehicleType: formValue.vehicleType,
+        price: formValue.price,
+        capacity: formValue.capacity,
+        description: formValue.description,
+        originCity: formValue.originCity,
+        destinationCity: formValue.destinationCity,
+        vehicleStatus: formValue.vehicleStatus
+      };
 
-      formData.append('vehicleRegNo', formValue.vehicleRegNo);
-      formData.append('permitLevel', formValue.permitLevel);
-      formData.append('driverMob', formValue.driverMob.toString());
-      formData.append('vehicleType', formValue.vehicleType);
-      formData.append('price', formValue.price.toString());
-      formData.append('capacity', formValue.capacity.toString());
-      formData.append('originCity', formValue.originCity || '');
-      formData.append('destinationCity', formValue.destinationCity || '');
-      formData.append('description', formValue.description || '');
-      formData.append('vehicleStatus', formValue.vehicleStatus);
-
-      // 🔥 ONLY append image if selected
-      if (this.selectedFile) {
-        formData.append('imageFile', this.selectedFile);
-      }
-
-      // Call update with FormData
-      this.vehicleService.updateVehicleWithFile(this.vehicleData.id!, formData).subscribe({
+      this.vehicleService.updateVehicle(this.vehicleData.id!, vehicleData).subscribe({
         next: (response) => {
           this.snackBar.open('Vehicle updated successfully!', '', {
             duration: 3000,
@@ -173,9 +139,7 @@ export class VehicleModalComponent implements OnInit {
         }
       });
     } else {
-      // For add mode, use FormData for file upload
-      const formData = new FormData();
-
+      // For add mode - use JSON add method
       const vehicleData = {
         vehicleRegNo: formValue.vehicleRegNo,
         permitLevel: formValue.permitLevel,
@@ -189,13 +153,7 @@ export class VehicleModalComponent implements OnInit {
         vehicleStatus: formValue.vehicleStatus
       };
 
-      formData.append('vehicle', new Blob([JSON.stringify(vehicleData)], { type: 'application/json' }));
-
-      if (this.selectedFile) {
-        formData.append('image', this.selectedFile);
-      }
-
-      this.vehicleService.addVehicleWithFile(formData).subscribe({
+      this.vehicleService.addVehicle(vehicleData).subscribe({
         next: (response) => {
           this.snackBar.open('Vehicle saved successfully!', '', {
             duration: 3000,
@@ -241,7 +199,6 @@ export class VehicleModalComponent implements OnInit {
 
   close() {
     this.vehicleForm.reset();
-    this.selectedFile = null;
     this.closeModal.emit();
   }
 }
