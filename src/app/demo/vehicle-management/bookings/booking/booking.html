@@ -72,15 +72,15 @@
             </div>
           </div>
 
-          <!-- Vehicle Number -->
+          <!-- Select Vehicle -->
           <div class="col-md-4 mb-3">
-            <label>Vehicle Number *</label>
-            <input formControlName="vehicleNo"
-              class="form-control" placeholder="Enter vehicle number" />
-            <div *ngIf="bookingForm.get('vehicleNo')?.invalid && bookingForm.get('vehicleNo')?.touched"
-                 class="text-danger mt-1">
-              <small>Vehicle number is required</small>
-            </div>
+            <label>Select Vehicle *</label>
+            <select formControlName="vehicleId" class="form-control">
+              <option value="" disabled>Select vehicle</option>
+              <option *ngFor="let v of availableVehicles" [value]="v.id">
+                {{ v.vehicleRegNo }} ({{ v.vehicleType }})
+              </option>
+            </select>
           </div>
 
            <div class="col-md-4 mb-3">

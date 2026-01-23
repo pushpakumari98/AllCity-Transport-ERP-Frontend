@@ -4,11 +4,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { BookingService } from 'src/app/demo/vehicle-management/bookings/services/booking.service';
-import { NotificationService } from 'src/app/shared/services/notification.service';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
-import { VehicleType } from '../../../../enums/vehicle-type.enum';
-import { VehicleStatus } from '../../../../enums/vehicle-status.enum';
 import { BookingStatus } from '../../../../enums/booking-status.enum';
+import { VehicleStatus } from '../../../../enums/vehicle-status.enum';
+import { VehicleType } from '../../../../enums/vehicle-type.enum';
 
 @Component({
   selector: 'app-booking',
@@ -49,6 +48,7 @@ export class Booking implements OnInit {
       startedFrom: ['', Validators.required],
       destination: ['', Validators.required],
       vehicleType: ['', Validators.required],
+      vehicleId: ['', Validators.required],
       driverName: ['', Validators.required],
       bookingHire: [0, Validators.required],
       bookingAdvance: [0, Validators.required],
@@ -59,8 +59,7 @@ export class Booking implements OnInit {
       podDocument: [''],
       lorryBalancePaidDate: [''],
       bookingStatus: ['PENDING', Validators.required],
-      vehicleStatus: ['AVAILABLE', Validators.required], // Required field
-      vehicleNo: ['', Validators.required] // NEW: Required vehicle number field
+      vehicleStatus: ['AVAILABLE', Validators.required] // Required field
     });
   }
 
@@ -68,27 +67,16 @@ export class Booking implements OnInit {
     this.loadAvailableVehicles();
   }
 
-  loadAvailableVehicles(): void {
-    this.loadingVehicles = true;
 
-    // Load all vehicles from backend (no status filtering for booking)
-    this.bookingService.getAllVehicles().subscribe({
+
+
+  loadAvailableVehicles(): void {
+    this.bookingService.getAvailableVehicles().subscribe({
       next: (vehicles) => {
-        console.log('Loaded vehicles from backend:', vehicles);
-        // Show all vehicles that exist in the system for booking
-        this.availableVehicles = vehicles || [];
-        this.loadingVehicles = false;
+        this.availableVehicles = vehicles;
       },
-      error: (err) => {
-        console.error('Error loading vehicles from backend:', err);
-        this.availableVehicles = []; // No vehicles available
-        this.loadingVehicles = false;
-        this.snackBar.open('Unable to load vehicles. Please check backend connection.', '', {
-          duration: 5000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center',
-          panelClass: 'error-snackbar'
-        });
+      error: () => {
+        this.snackBar.open('No available vehicles', '', { duration: 3000 });
       }
     });
   }
@@ -108,18 +96,11 @@ export class Booking implements OnInit {
 
     const formValue = this.bookingForm.value;
 
-    // Find the selected vehicle from all vehicles (no status filtering)
-    let selectedVehicle = this.availableVehicles.find(v =>
-      v.vehicleType === formValue.vehicleType
-    );
-
-    // If no vehicle matches the type, assign any vehicle
-    if (!selectedVehicle) {
-      selectedVehicle = this.availableVehicles[0]; // Take first available vehicle
-    }
+    // Find the selected vehicle by ID
+    const selectedVehicle = this.availableVehicles.find(v => v.id == formValue.vehicleId);
 
     if (!selectedVehicle) {
-      this.snackBar.open('No available vehicles found!', '', {
+      this.snackBar.open('Selected vehicle not found!', '', {
         duration: 3000,
         verticalPosition: 'top',
         horizontalPosition: 'center',
@@ -132,10 +113,10 @@ export class Booking implements OnInit {
       id: Date.now(),
       bookingId: `BK-${Date.now()}`,
       vehicleId: selectedVehicle.id,
-      vehicleNo: formValue.vehicleNo,
+      vehicleNo: selectedVehicle.vehicleRegNo,
       startedFrom: formValue.startedFrom,
       destination: formValue.destination,
-      vehicleType: formValue.vehicleType,
+      vehicleType: selectedVehicle.vehicleType,
       driverName: formValue.driverName,
       bookingHire: formValue.bookingHire,
       bookingAdvance: formValue.bookingAdvance,

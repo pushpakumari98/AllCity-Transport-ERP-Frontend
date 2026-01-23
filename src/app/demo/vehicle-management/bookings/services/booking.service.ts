@@ -74,6 +74,11 @@ export class BookingService {
     return this.http.get<Vehicle[]>(this.vehiclesUrl);
   }
 
+  // ✅ Get available vehicles
+  getAvailableVehicles(): Observable<Vehicle[]> {
+    return this.getAllVehicles();
+  }
+
   // ✅ Get vehicle by ID
   getVehicleById(id: number): Observable<Vehicle> {
     return this.http.get<Vehicle>(`${this.vehiclesUrl}/${id}`);
