@@ -25,7 +25,7 @@ export class SaleModalComponent implements OnInit {
 
   saleForm!: FormGroup;
 
-  paymentModes = ['UPI', 'IMPS'];
+  paymentModes = ['UPI', 'IMPS', 'CASH', 'NETBANKING', 'CREDIT CARD', 'DEBIT CARD'];
 
   constructor(private fb: FormBuilder, private saleService: SaleService, private snackBar: MatSnackBar) {}
 
