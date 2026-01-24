@@ -32,7 +32,7 @@ export class PurchaseComponent implements OnInit {
   ) {
     this.purchaseForm = this.fb.group({
       date: ['', Validators.required],
-      vehicleNo: ['', Validators.required],
+      vehicleNo: ['', [Validators.required, Validators.pattern(/^([A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}|[A-Z]{3}[0-9]{2}[A-Z]{3})$/)]],
       bookingHire: ['', Validators.required],
       bookingReceivingBalanceDate: [''],
       fromLocation: ['', Validators.required],
@@ -62,7 +62,10 @@ export class PurchaseComponent implements OnInit {
       return;
     }
 
-    const payload = this.purchaseForm.value;
+    const payload = {
+      ...this.purchaseForm.value,
+      vehicleNo: this.purchaseForm.value.vehicleNo.toUpperCase()
+    };
 
     this.purchaseService.addPurchase(payload).subscribe({
       next: (response) => {
@@ -81,24 +84,22 @@ export class PurchaseComponent implements OnInit {
         this.router.navigate(['/app/purchase-list']);
       },
 
-      error: (error) => {
-        console.error('Backend error, treating as demo mode:', error);
-        this.snackBar.open('Vehicle purchased successfully! (Demo mode)', '', {
-          duration: 3000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center',
-          panelClass: 'success-snackbar'
-        });
+     error: (error) => {
+  console.error('Backend error:', error);
+  const msg = error?.error?.message || 'Failed to save vehicle purchase. Please try again.';
 
-        // For demo mode, save to localStorage
-        this.savePurchaseToLocalStorage(payload);
+  this.snackBar.open(
+    msg,
+    '',
+    {
+      duration: 4000,
+      verticalPosition: 'top',
+      horizontalPosition: 'center',
+      panelClass: 'error-snackbar'
+    }
+  );
+}
 
-        // Trigger notification
-        // this.notificationService.notifyPurchase(payload);
-
-        this.purchaseForm.reset();
-        this.router.navigate(['/app/purchase-list']);
-      }
     });
   }
 

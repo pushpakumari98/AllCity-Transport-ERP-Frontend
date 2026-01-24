@@ -53,21 +53,16 @@ export class VehiclePurchaseReportsComponent implements OnInit {
     this.purchaseService.getAllPurchases().subscribe({
       next: (res) => {
         console.log("PURCHASE REPORTS:", res);
-        // If backend returns empty data, load mock data
-        if (!res || res.length === 0) {
-          this.loadMockData();
-        } else {
-          this.purchases = res;
-        }
+        this.purchases = res || [];
         this.calculateStats();
         this.applyFilter();
         this.loading = false;
       },
       error: (err) => {
         console.error("Error fetching purchases:", err);
-        this.loadMockData();
+        this.purchases = [];
         this.loading = false;
-        this.snackBar.open('Loaded sample purchase data for demo', '', {
+        this.snackBar.open('Error loading purchase data', '', {
           duration: 3000,
           verticalPosition: 'top',
           horizontalPosition: 'center'
@@ -76,56 +71,6 @@ export class VehiclePurchaseReportsComponent implements OnInit {
     });
   }
 
-  private loadMockData() {
-    this.purchases = [
-      {
-        id: 1,
-        date: "2025-12-01",
-        vehicleNo: "MH12AB1234",
-        vehicleNumber: "MH12AB1234",
-        vehicleModel: "Tata Ace",
-        purchaseDate: "2025-12-01",
-        price: 450000,
-        vendorName: "Tata Motors",
-        paymentMode: "Bank Transfer"
-      },
-      {
-        id: 2,
-        date: "2025-12-02",
-        vehicleNo: "MH12CD5678",
-        vehicleNumber: "MH12CD5678",
-        vehicleModel: "Mahindra Pickup",
-        purchaseDate: "2025-12-02",
-        price: 650000,
-        vendorName: "Mahindra & Mahindra",
-        paymentMode: "UPI"
-      },
-      {
-        id: 3,
-        date: "2025-11-15",
-        vehicleNo: "MH12EF9012",
-        vehicleNumber: "MH12EF9012",
-        vehicleModel: "Ashok Leyland Truck",
-        purchaseDate: "2025-11-15",
-        price: 1200000,
-        vendorName: "Ashok Leyland",
-        paymentMode: "Cheque"
-      },
-      {
-        id: 4,
-        date: "2025-10-20",
-        vehicleNo: "MH12GH3456",
-        vehicleNumber: "MH12GH3456",
-        vehicleModel: "Bajaj Tempo",
-        purchaseDate: "2025-10-20",
-        price: 350000,
-        vendorName: "Bajaj Auto",
-        paymentMode: "Cash"
-      }
-    ];
-    this.calculateStats();
-    this.applyFilter();
-  }
 
   calculateStats() {
     const today = new Date();

@@ -1,7 +1,14 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnInit,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { PurchaseService } from '../services/purchase.service';
 import { VehiclePurchase } from '../models/vehicle-purchase.model';
@@ -13,78 +20,48 @@ import { VehiclePurchase } from '../models/vehicle-purchase.model';
   templateUrl: './purchase-modal.component.html',
   styleUrls: ['./purchase-modal.component.scss']
 })
-export class PurchaseModalComponent implements OnInit {
+export class PurchaseModalComponent implements OnInit, OnChanges {
 
   @Input() show = false;
   @Input() editMode = false;
-  @Input() purchaseData!: VehiclePurchase;
+  @Input() isViewMode = false;
+  @Input() purchaseData!: VehiclePurchase | null;
 
   @Output() closeModal = new EventEmitter<void>();
   @Output() refreshList = new EventEmitter<void>();
-  @Output() purchaseSaved = new EventEmitter<any>();
+  @Output() purchaseSaved = new EventEmitter<VehiclePurchase>();
 
   purchaseForm!: FormGroup;
 
-  paymentModes = ['UPI', 'IMPS', 'NETBANKING', 'CASH', 'CREDIT_CARD', 'DEBIT_CARD'];
+  constructor(
+    private fb: FormBuilder,
+    private purchaseService: PurchaseService,
+    private snackBar: MatSnackBar
+  ) {}
 
-
-
-  // Determine if this is view mode (read-only)
-  get isViewMode(): boolean {
-    return !this.editMode && !!this.purchaseData?.slNo;
-  }
-
-  constructor(private fb: FormBuilder, private purchaseService: PurchaseService, private snackBar: MatSnackBar) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.initializeForm();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['show'] && changes['show'].currentValue) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['show']?.currentValue) {
       this.purchaseForm.reset();
 
-      if (this.purchaseData) {
+      if (this.editMode && this.purchaseData) {
+        // EDIT MODE
         this.purchaseForm.patchValue(this.purchaseData);
-
-        // Disable form in view mode
-        if (this.isViewMode) {
-          this.purchaseForm.disable();
-        } else {
-          this.purchaseForm.enable();
-        }
-      } else if (!this.editMode) {
-        // Pre-fill with sample data for new entries
-        this.prefillWithSampleData();
+        this.purchaseForm.enable();
       } else {
-        // For edit mode, ensure form has valid data
-        if (this.editMode && this.purchaseData) {
-          this.purchaseForm.patchValue(this.purchaseData);
-        }
+        // ADD MODE
+        this.purchaseForm.enable();
       }
     }
   }
 
-  private prefillWithSampleData() {
-    // Pre-fill with sample data for demo purposes
-    this.purchaseForm.patchValue({
-      date: '2025-01-15',
-      vehicleNo: 'MH12AB1234',
-      bookingHire: 'John Doe Transport',
-      bookingReceivingBalanceDate: '2025-01-16',
-      fromLocation: 'Mumbai',
-      toLocation: 'Delhi',
-      transportName: 'Blue Dart',
-      detain: '500',
-      podReceivedDate: '2025-01-18',
-      lorryBalancePaidDate: '2025-01-20'
-    });
-  }
-
-  private initializeForm() {
+  private initializeForm(): void {
     this.purchaseForm = this.fb.group({
       date: ['', Validators.required],
-      vehicleNo: ['', Validators.required],
+      vehicleNo: ['', [Validators.required, Validators.pattern(/^([A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}|[A-Z]{3}[0-9]{2}[A-Z]{3})$/)]],
       bookingHire: ['', Validators.required],
       bookingReceivingBalanceDate: [''],
       fromLocation: ['', Validators.required],
@@ -96,59 +73,64 @@ export class PurchaseModalComponent implements OnInit {
     });
   }
 
-  savePurchase() {
+  savePurchase(): void {
     if (this.purchaseForm.invalid) {
-      this.snackBar.open('Please fill all required fields correctly.', '', {
+      this.purchaseForm.markAllAsTouched();
+      this.snackBar.open('Please fill all required fields.', '', {
         duration: 3000,
         verticalPosition: 'top',
         horizontalPosition: 'center',
         panelClass: 'error-snackbar'
       });
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.purchaseForm.controls).forEach(key => {
-        this.purchaseForm.get(key)?.markAsTouched();
-      });
       return;
     }
 
-    const payload = this.purchaseForm.value;
-    const purchaseData = this.editMode ? { ...this.purchaseData, ...payload } : { ...payload };
+    const payload = {
+      ...this.purchaseForm.value,
+      vehicleNo: this.purchaseForm.value.vehicleNo.toUpperCase(),
+      bookingHire: Number(this.purchaseForm.value.bookingHire),
+      detain: Number(this.purchaseForm.value.detain)
+    };
 
-    const observable = this.editMode
+    const purchaseData = this.editMode
+      ? { ...this.purchaseData!, ...payload }
+      : payload;
+
+    const request$ = this.editMode
       ? this.purchaseService.updatePurchase(purchaseData)
       : this.purchaseService.addPurchase(purchaseData);
 
-    const action = this.editMode ? 'updated' : 'saved';
+    request$.subscribe({
+      next: (response) => {
+        this.snackBar.open(
+          `Purchase ${this.editMode ? 'updated' : 'saved'} successfully!`,
+          '',
+          {
+            duration: 3000,
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            panelClass: 'success-snackbar'
+          }
+        );
 
-    observable.subscribe({
-      next: (result) => {
-        console.log(`Purchase ${action} successfully:`, result);
-        this.snackBar.open(`Purchase ${action} successfully!`, '', {
-          duration: 3000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center',
-          panelClass: 'success-snackbar'
-        });
-        this.purchaseSaved.emit(result || purchaseData);
+        this.purchaseSaved.emit(response);
         this.refreshList.emit();
         this.close();
       },
-      error: (err) => {
-        console.error(`Error ${action} purchase:`, err);
-        this.snackBar.open(`Purchase ${action} successfully! (Demo mode)`, '', {
+      error: (error) => {
+        console.error('Purchase save failed:', error);
+        const msg = error?.error?.message || 'Something went wrong. Please try again.';
+        this.snackBar.open(msg, '', {
           duration: 3000,
           verticalPosition: 'top',
           horizontalPosition: 'center',
-          panelClass: 'success-snackbar'
+          panelClass: 'error-snackbar'
         });
-        this.purchaseSaved.emit(purchaseData);
-        this.refreshList.emit();
-        this.close();
       }
     });
   }
 
-  close() {
+  close(): void {
     this.purchaseForm.reset();
     this.closeModal.emit();
   }

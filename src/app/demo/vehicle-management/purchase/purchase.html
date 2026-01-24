@@ -22,14 +22,14 @@
           </div>
           <div class="col-md-4 mb-3">
             <label>Vehicle Number</label>
-            <input formControlName="vehicleNo" class="form-control" placeholder="Enter Vehicle Number" />
+            <input formControlName="vehicleNo" class="form-control" placeholder="MH12AB1234" style="text-transform: uppercase" maxlength="13" />
             <div *ngIf="purchaseForm.get('vehicleNo')?.invalid && purchaseForm.get('vehicleNo')?.touched" class="text-danger mt-1">
               <small>Vehicle Number is required</small>
             </div>
           </div>
           <div class="col-md-4 mb-3">
             <label>Booking Hire</label>
-            <input formControlName="bookingHire" class="form-control" placeholder="Enter Booking Hire" />
+            <input type="number" formControlName="bookingHire" class="form-control" placeholder="Enter Booking Hire" />
             <div *ngIf="purchaseForm.get('bookingHire')?.invalid && purchaseForm.get('bookingHire')?.touched" class="text-danger mt-1">
               <small>Booking Hire is required</small>
             </div>
@@ -64,7 +64,7 @@
           </div>
           <div class="col-md-4 mb-3">
             <label>Detain</label>
-            <input formControlName="detain" class="form-control" placeholder="Enter Detain " />
+            <input type="number" formControlName="detain" class="form-control" placeholder="Enter Detain" />
             <div *ngIf="purchaseForm.get('detain')?.invalid && purchaseForm.get('detain')?.touched" class="text-danger mt-1">
               <small>Detain is required</small>
             </div>

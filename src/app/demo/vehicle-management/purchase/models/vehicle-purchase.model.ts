@@ -1,20 +1,25 @@
+
 export interface VehiclePurchase {
-  slNo?: number;
-  id?: number;
+  id?: number; // backend primary key
+
+  // Purchase management properties
   date: string;
-  purchaseDate?: string;
   vehicleNo: string;
-  vehicleNumber?: string;
-  vehicleModel?: string;
-  price?: number;
-  vendorName?: string;
-  paymentMode?: string;
-  bookingHire?: number;
+  bookingHire: string;
   bookingReceivingBalanceDate?: string;
-  fromLocation?: string;
-  toLocation?: string;
-  transportName?: string;
-  detain?: string;
+  fromLocation: string;
+  toLocation: string;
+  transportName: string;
+  detain: string;
   podReceivedDate?: string;
   lorryBalancePaidDate?: string;
+
+  // Vehicle purchase reports properties
+  vehicleNumber: string;
+  vehicleModel: string;
+  purchaseDate: string;
+  price: number;
+  vendorName: string;
+  paymentMode: string;
 }
+

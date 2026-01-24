@@ -64,29 +64,40 @@
               <th class="text-center">Action</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let purchase of purchases; trackBy: trackByPurchaseId">
-              <td class="text-center">{{ purchase.slNo }}</td>
-              <td class="text-center">{{ purchase.date }}</td>
-              <td class="text-center">{{ purchase.vehicleNo }}</td>
-              <td class="text-center">{{ purchase.bookingHire }}</td>
-              <td class="text-center">{{ purchase.bookingReceivingBalanceDate }}</td>
-              <td class="text-center">{{ purchase.fromLocation }}</td>
-              <td class="text-center">{{ purchase.toLocation }}</td>
-              <td class="text-center">{{ purchase.transportName }}</td>
-              <td class="text-center">{{ purchase.detain }}</td>
-              <td class="text-center">{{ purchase.podReceivedDate }}</td>
-              <td class="text-center">{{ purchase.lorryBalancePaidDate }}</td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-warning me-1" (click)="updatePurchase(purchase)" title="Update">
-                  <i class="fa fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" (click)="deletePurchase(purchase)" title="Delete">
-                  <i class="fa fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
+         <tbody>
+  <tr *ngFor="let purchase of purchases; let i = index; trackBy: trackByPurchaseId">
+    <!-- UI-only Serial Number -->
+    <td class="text-center">{{ i + 1 }}</td>
+
+    <td class="text-center">{{ purchase.date }}</td>
+    <td class="text-center">{{ purchase.vehicleNo }}</td>
+    <td class="text-center">{{ purchase.bookingHire }}</td>
+    <td class="text-center">{{ purchase.bookingReceivingBalanceDate }}</td>
+    <td class="text-center">{{ purchase.fromLocation }}</td>
+    <td class="text-center">{{ purchase.toLocation }}</td>
+    <td class="text-center">{{ purchase.transportName }}</td>
+    <td class="text-center">{{ purchase.detain }}</td>
+    <td class="text-center">{{ purchase.podReceivedDate }}</td>
+    <td class="text-center">{{ purchase.lorryBalancePaidDate }}</td>
+
+    <td class="text-center">
+      <button
+        class="btn btn-sm btn-warning me-1"
+        (click)="updatePurchase(purchase)"
+        title="Update">
+        <i class="fa fa-edit"></i>
+      </button>
+
+      <button
+        class="btn btn-sm btn-danger"
+        (click)="deletePurchase(purchase)"
+        title="Delete">
+        <i class="fa fa-trash"></i>
+      </button>
+    </td>
+  </tr>
+</tbody>
+
         </table>
       </div>
     </div>
@@ -116,6 +127,7 @@
 <app-purchase-modal
   [show]="showPurchaseModal"
   [editMode]="editMode"
+  [isViewMode]="false"
   [purchaseData]="selectedPurchase"
   (closeModal)="closePurchaseModal()"
   (refreshList)="loadPurchases()"
