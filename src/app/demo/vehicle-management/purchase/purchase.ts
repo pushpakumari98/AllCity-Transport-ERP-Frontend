@@ -64,7 +64,9 @@ export class PurchaseComponent implements OnInit {
 
     const payload = {
       ...this.purchaseForm.value,
-      vehicleNo: this.purchaseForm.value.vehicleNo.toUpperCase()
+      vehicleNo: this.purchaseForm.value.vehicleNo.toUpperCase(),
+      bookingHire: Number(this.purchaseForm.value.bookingHire),
+      detain: Number(this.purchaseForm.value.detain)
     };
 
     this.purchaseService.addPurchase(payload).subscribe({

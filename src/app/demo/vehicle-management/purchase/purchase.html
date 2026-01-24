@@ -24,7 +24,7 @@
             <label>Vehicle Number</label>
             <input formControlName="vehicleNo" class="form-control" placeholder="MH12AB1234" style="text-transform: uppercase" maxlength="13" />
             <div *ngIf="purchaseForm.get('vehicleNo')?.invalid && purchaseForm.get('vehicleNo')?.touched" class="text-danger mt-1">
-              <small>Vehicle Number is required</small>
+              <small>Enter correct vehicle no</small>
             </div>
           </div>
           <div class="col-md-4 mb-3">
