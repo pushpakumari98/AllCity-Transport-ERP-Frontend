@@ -19,9 +19,9 @@
 
             <div class="col-md-6">
               <label for="bookingHire">Booking Hire</label>
-              <input type="number" id="bookingHire" formControlName="bookingHire" class="form-control" placeholder="Enter Booking Hire" />
+              <input type="number" id="bookingHire" formControlName="bookingHire" class="form-control" placeholder="Enter Booking Hire" min="0" />
               <div *ngIf="purchaseForm.get('bookingHire')?.invalid && purchaseForm.get('bookingHire')?.touched" class="text-danger mt-1">
-                <small>Booking Hire is required</small>
+                <small>Booking Hire is required and must be a positive number</small>
               </div>
             </div>
 
@@ -56,7 +56,7 @@
 
             <div class="col-md-6">
               <label for="detain">Detain</label>
-              <input type="number" id="detain" formControlName="detain" class="form-control" placeholder="Enter Detain" />
+              <input type="text" id="detain" formControlName="detain" class="form-control" placeholder="Enter Detain" />
               <div *ngIf="purchaseForm.get('detain')?.invalid && purchaseForm.get('detain')?.touched" class="text-danger mt-1">
                 <small>Detain is required</small>
               </div>

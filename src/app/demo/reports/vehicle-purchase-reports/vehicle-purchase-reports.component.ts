@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { VehiclePurchase } from '../../vehicle-management/purchase/models/vehicle-purchase.model';
+import { VehiclePurchaseReport } from '../models/vehicle-purchase-report.model';
 import { PurchaseService } from '../../vehicle-management/purchase/services/purchase.service';
 
 @Component({
@@ -83,57 +84,57 @@ export class VehiclePurchaseReportsComponent implements OnInit {
     const yearStart = new Date(today.getFullYear(), 0, 1);
 
     this.todayPurchases = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate.getTime() === today.getTime();
     }).length;
 
     this.weekPurchases = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate >= weekStart;
     }).length;
 
     this.monthPurchases = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate >= monthStart;
     }).length;
 
     this.yearPurchases = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate >= yearStart;
     }).length;
 
     this.totalPurchases = this.purchases.length;
 
-    // Calculate values
+    // Calculate values using bookingHire instead of price
     this.todayPurchaseValue = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate.getTime() === today.getTime();
-    }).reduce((sum, p) => sum + p.price, 0);
+    }).reduce((sum, p) => sum + p.bookingHire, 0);
 
     this.weekPurchaseValue = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate >= weekStart;
-    }).reduce((sum, p) => sum + p.price, 0);
+    }).reduce((sum, p) => sum + p.bookingHire, 0);
 
     this.monthPurchaseValue = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate >= monthStart;
-    }).reduce((sum, p) => sum + p.price, 0);
+    }).reduce((sum, p) => sum + p.bookingHire, 0);
 
     this.yearPurchaseValue = this.purchases.filter(p => {
-      const purchaseDate = new Date(p.purchaseDate);
+      const purchaseDate = new Date(p.date);
       purchaseDate.setHours(0, 0, 0, 0);
       return purchaseDate >= yearStart;
-    }).reduce((sum, p) => sum + p.price, 0);
+    }).reduce((sum, p) => sum + p.bookingHire, 0);
 
-    this.totalPurchaseValue = this.purchases.reduce((sum, p) => sum + p.price, 0);
+    this.totalPurchaseValue = this.purchases.reduce((sum, p) => sum + p.bookingHire, 0);
   }
 
   applyFilter() {
@@ -146,7 +147,7 @@ export class VehiclePurchaseReportsComponent implements OnInit {
       case 'today':
         filterDate = today;
         this.filteredPurchases = this.purchases.filter(p => {
-          const purchaseDate = new Date(p.purchaseDate);
+          const purchaseDate = new Date(p.date);
           purchaseDate.setHours(0, 0, 0, 0);
           return purchaseDate.getTime() === filterDate.getTime();
         });
@@ -155,7 +156,7 @@ export class VehiclePurchaseReportsComponent implements OnInit {
         const weekStart = new Date(today);
         weekStart.setDate(today.getDate() - today.getDay());
         this.filteredPurchases = this.purchases.filter(p => {
-          const purchaseDate = new Date(p.purchaseDate);
+          const purchaseDate = new Date(p.date);
           purchaseDate.setHours(0, 0, 0, 0);
           return purchaseDate >= weekStart;
         });
@@ -163,7 +164,7 @@ export class VehiclePurchaseReportsComponent implements OnInit {
       case 'thisMonth':
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
         this.filteredPurchases = this.purchases.filter(p => {
-          const purchaseDate = new Date(p.purchaseDate);
+          const purchaseDate = new Date(p.date);
           purchaseDate.setHours(0, 0, 0, 0);
           return purchaseDate >= monthStart;
         });
@@ -171,7 +172,7 @@ export class VehiclePurchaseReportsComponent implements OnInit {
       case 'thisYear':
         const yearStart = new Date(today.getFullYear(), 0, 1);
         this.filteredPurchases = this.purchases.filter(p => {
-          const purchaseDate = new Date(p.purchaseDate);
+          const purchaseDate = new Date(p.date);
           purchaseDate.setHours(0, 0, 0, 0);
           return purchaseDate >= yearStart;
         });
@@ -198,21 +199,12 @@ export class VehiclePurchaseReportsComponent implements OnInit {
   }
 
   getPaymentMethods(): { method: string; count: number }[] {
-    const paymentMethods: { [key: string]: number } = {};
-
-    this.filteredPurchases.forEach(purchase => {
-      const method = purchase.paymentMode || 'N/A';
-      paymentMethods[method] = (paymentMethods[method] || 0) + 1;
-    });
-
-    return Object.entries(paymentMethods).map(([method, count]) => ({
-      method,
-      count
-    }));
+    // Since we don't have paymentMode in the backend entity, we'll return empty array
+    return [];
   }
 
   getTotalValue(): number {
-    return this.filteredPurchases.reduce((sum, purchase) => sum + purchase.price, 0);
+    return this.filteredPurchases.reduce((sum, purchase) => sum + purchase.bookingHire, 0);
   }
 
   // Export methods
@@ -224,15 +216,16 @@ export class VehiclePurchaseReportsComponent implements OnInit {
 
     const data = this.filteredPurchases.map(purchase => [
       purchase.id || '',
-      purchase.vehicleNumber || '',
-      purchase.vehicleModel || '',
-      purchase.purchaseDate || '',
-      purchase.price || '',
-      purchase.vendorName || '',
-      purchase.paymentMode || ''
+      purchase.vehicleNo || '',
+      purchase.fromLocation || '',
+      purchase.toLocation || '',
+      purchase.transportName || '',
+      purchase.bookingHire || '',
+      purchase.detain || '',
+      purchase.date || ''
     ]);
 
-    const headers = ['ID', 'Vehicle Number', 'Vehicle Model', 'Purchase Date', 'Price', 'Vendor Name', 'Payment Mode'];
+    const headers = ['ID', 'Vehicle No', 'From Location', 'To Location', 'Transport Name', 'Booking Hire', 'Detain', 'Date'];
     const csvContent = [headers, ...data].map(row => row.join(',')).join('\n');
     const blob = new Blob([csvContent]);
     const link = document.createElement('a');
@@ -273,10 +266,10 @@ export class VehiclePurchaseReportsComponent implements OnInit {
       pdf.text('AllCity Transport - Vehicle Purchase Reports', 20, 20);
       let y = 40;
       pdf.setFontSize(12);
-      pdf.text('ID | Vehicle Number | Model | Date | Price | Vendor', 20, y);
+      pdf.text('ID | Vehicle No | From | To | Transport | Booking Hire | Detain | Date', 20, y);
       y += 20;
       this.filteredPurchases.forEach(purchase => {
-        pdf.text(`${purchase.id} | ${purchase.vehicleNumber} | ${purchase.vehicleModel} | ${purchase.purchaseDate} | ₹${purchase.price} | ${purchase.vendorName}`, 20, y);
+        pdf.text(`${purchase.id} | ${purchase.vehicleNo} | ${purchase.fromLocation} | ${purchase.toLocation} | ${purchase.transportName} | ₹${purchase.bookingHire} | ${purchase.detain} | ${purchase.date}`, 20, y);
         y += 10;
         if (y > 280) {
           pdf.addPage();
@@ -305,9 +298,9 @@ export class VehiclePurchaseReportsComponent implements OnInit {
             <h1>AllCity Transport - Vehicle Purchase Report</h1>
             <table border="1" style="border-collapse: collapse;">
               <tr>
-                <th>ID</th><th>Vehicle Number</th><th>Vehicle Model</th><th>Purchase Date</th><th>Price</th><th>Vendor Name</th><th>Payment Mode</th>
+                <th>ID</th><th>Vehicle No</th><th>From Location</th><th>To Location</th><th>Transport Name</th><th>Booking Hire</th><th>Detain</th><th>Date</th>
               </tr>
-              ${this.filteredPurchases.map(p => `<tr><td>${p.id}</td><td>${p.vehicleNumber}</td><td>${p.vehicleModel}</td><td>${p.purchaseDate}</td><td>₹${p.price}</td><td>${p.vendorName}</td><td>${p.paymentMode}</td></tr>`).join('')}
+              ${this.filteredPurchases.map(p => `<tr><td>${p.id}</td><td>${p.vehicleNo}</td><td>${p.fromLocation}</td><td>${p.toLocation}</td><td>${p.transportName}</td><td>₹${p.bookingHire}</td><td>${p.detain}</td><td>${p.date}</td></tr>`).join('')}
             </table>
           </body>
         </html>
@@ -336,16 +329,17 @@ export class VehiclePurchaseReportsComponent implements OnInit {
             <thead>
               <tr style="background-color: #f0f0f0;">
                 <th style="border: 1px solid #ddd; padding: 8px;">ID</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Vehicle Number</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Vehicle Model</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Purchase Date</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Price</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Vendor Name</th>
-                <th style="border: 1px solid #ddd; padding: 8px;">Payment Mode</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Vehicle No</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">From Location</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">To Location</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Transport Name</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Booking Hire</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Detain</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Date</th>
               </tr>
             </thead>
             <tbody>
-              ${this.filteredPurchases.map(p => `<tr><td style="border: 1px solid #ddd; padding: 8px;">${p.id}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.vehicleNumber}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.vehicleModel}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.purchaseDate}</td><td style="border: 1px solid #ddd; padding: 8px;">₹${p.price}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.vendorName}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.paymentMode}</td></tr>`).join('')}
+              ${this.filteredPurchases.map(p => `<tr><td style="border: 1px solid #ddd; padding: 8px;">${p.id}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.vehicleNo}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.fromLocation}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.toLocation}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.transportName}</td><td style="border: 1px solid #ddd; padding: 8px;">₹${p.bookingHire}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.detain}</td><td style="border: 1px solid #ddd; padding: 8px;">${p.date}</td></tr>`).join('')}
             </tbody>
           </table>
         </div>

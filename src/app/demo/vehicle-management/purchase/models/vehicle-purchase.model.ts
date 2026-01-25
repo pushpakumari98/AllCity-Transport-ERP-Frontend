@@ -1,25 +1,17 @@
 
 export interface VehiclePurchase {
-  id?: number; // backend primary key
+  id?: number; // backend primary key (sl_no)
 
-  // Purchase management properties
-  date: string;
+  // Fields that match the backend Java entity exactly
   vehicleNo: string;
-  bookingHire: string;
-  bookingReceivingBalanceDate?: string;
+  bookingHire: number;
   fromLocation: string;
   toLocation: string;
   transportName: string;
-  detain: string;
+  detain: string; // This should be string to match backend
+  date: string;
+  bookingReceivingBalanceDate?: string;
   podReceivedDate?: string;
   lorryBalancePaidDate?: string;
-
-  // Vehicle purchase reports properties
-  vehicleNumber: string;
-  vehicleModel: string;
-  purchaseDate: string;
-  price: number;
-  vendorName: string;
-  paymentMode: string;
 }
 

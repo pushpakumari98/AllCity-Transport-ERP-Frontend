@@ -62,12 +62,12 @@ export class PurchaseModalComponent implements OnInit, OnChanges {
     this.purchaseForm = this.fb.group({
       date: ['', Validators.required],
       vehicleNo: ['', [Validators.required, Validators.pattern(/^([A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}|[A-Z]{3}[0-9]{2}[A-Z]{3})$/)]],
-      bookingHire: ['', Validators.required],
+      bookingHire: ['', [Validators.required, Validators.min(0)]],
       bookingReceivingBalanceDate: [''],
       fromLocation: ['', Validators.required],
       toLocation: ['', Validators.required],
       transportName: ['', Validators.required],
-      detain: ['', Validators.required],
+      detain: ['', Validators.required], // detain should be string to match backend
       podReceivedDate: [''],
       lorryBalancePaidDate: ['']
     });
@@ -89,7 +89,7 @@ export class PurchaseModalComponent implements OnInit, OnChanges {
       ...this.purchaseForm.value,
       vehicleNo: this.purchaseForm.value.vehicleNo.toUpperCase(),
       bookingHire: Number(this.purchaseForm.value.bookingHire),
-      detain: Number(this.purchaseForm.value.detain)
+      detain: this.purchaseForm.value.detain // Keep detain as string to match backend
     };
 
     const purchaseData = this.editMode
