@@ -25,7 +25,7 @@
       "dom"
     ],
     "typeRoots": ["node_modules/@types"],
-    "types": ["jasmine"]
+    "types": ["jasmine", "jest"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
