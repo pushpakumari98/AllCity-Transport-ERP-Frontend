@@ -79,10 +79,11 @@ export class DriversListComponent implements OnInit {
 
 
   addDriver() {
-    // Show the driver modal for adding new driver
+    // Show the driver form and hide the list (form becomes main content)
     this.editMode = false;
     this.selectedDriver = undefined;
     this.showDriverModal = true;
+    this.showList = false; // Hide the list when showing the form
   }
 
   updateDriver(driver: Driver) {
@@ -186,11 +187,13 @@ export class DriversListComponent implements OnInit {
 
   closeDriverModal() {
     this.showDriverModal = false;
+    this.showList = true; // Show the list again when modal is closed
   }
 
   onDriverSaved(updatedDriver: any) {
     // Close the modal and load the drivers list like bookings page
     this.showDriverModal = false;
+    this.showList = true; // Show the list again after saving
     this.loadDrivers();
   }
 
