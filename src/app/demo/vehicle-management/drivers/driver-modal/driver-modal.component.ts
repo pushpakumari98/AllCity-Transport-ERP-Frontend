@@ -54,16 +54,7 @@ export class DriverModalComponent implements OnInit, OnChanges {
     });
   }
 
-  onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.driverForm.patchValue({ document: reader.result as string });
-      };
-      reader.readAsDataURL(file);
-    }
-  }
+
 
   saveDriver() {
     if (this.driverForm.invalid) return;
