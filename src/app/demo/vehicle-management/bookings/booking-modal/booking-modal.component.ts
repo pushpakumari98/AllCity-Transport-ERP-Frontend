@@ -4,7 +4,9 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BookingService } from '../services/booking.service';
-import { VehicleBooking } from '../models/vehicle-booking.model';
+import { VehicleBooking, VehicleBookingDTO } from '../models/vehicle-booking.model';
+import { VehicleService } from '../../services/vehicle.service';
+import { Vehicle } from '../../../../model/vehicle.model';
 
 @Component({
   selector: 'app-booking-modal',
@@ -29,10 +31,14 @@ export class BookingModalComponent implements OnInit, OnChanges {
   bookingStatus = ['UPCOMING', 'INPROGRESS', 'COMPLETED', 'PENDING','OVERDUE','CANCELLED'];
   vehicleStatus = ['AVAILABLE', 'IN_PROGRESS', 'COMPLETED','PENDING','OVERDUE','MAINTENANCE'];
 
-  constructor(private fb: FormBuilder, private bookingService: BookingService, private snackBar: MatSnackBar) {}
+  vehicles: Vehicle[] = [];
+  loadingVehicles = false;
+
+  constructor(private fb: FormBuilder, private bookingService: BookingService, private vehicleService: VehicleService, private snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.initializeForm();
+    this.loadVehicles();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -91,38 +97,108 @@ export class BookingModalComponent implements OnInit, OnChanges {
   saveBooking() {
     if (this.bookingForm.invalid) return;
 
-    const payload = this.bookingForm.value;
-    const bookingData = this.editMode ? { ...this.bookingData, ...payload } : { ...payload, id: Date.now() };
-    const observable = this.editMode
-      ? this.bookingService.updateBooking(bookingData)
-      : this.bookingService.addBooking(bookingData);
+    const formValue = this.bookingForm.value;
 
-    const action = this.editMode ? 'updated' : 'saved';
+    if (this.editMode) {
+      // For edit mode, use the full booking object
+      const bookingData = { ...this.bookingData, ...formValue };
+      this.bookingService.updateBooking(bookingData).subscribe({
+        next: () => {
+          this.snackBar.open('Booking updated successfully!', '', {
+            duration: 3000,
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            panelClass: 'success-snackbar'
+          });
+          this.bookingSaved.emit(bookingData);
+          this.refreshList.emit();
+          this.close();
+        },
+        error: (err) => {
+          console.error('Error updating booking:', err);
+          this.snackBar.open('Failed to update booking', '', {
+            duration: 3000,
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            panelClass: 'error-snackbar'
+          });
+        }
+      });
+    } else {
+      // For new booking, create DTO with only required fields
+      const bookingDTO: VehicleBookingDTO = {
+        vehicleId: parseInt(formValue.vehicleId),
+        startedFrom: formValue.startedFrom,
+        destination: formValue.destination,
+        driverName: formValue.driverName,
+        bookingHire: formValue.bookingHire,
+        bookingAdvance: formValue.bookingAdvance || 0,
+        bookingBalance: formValue.bookingBalance || 0
+      };
 
-    observable.subscribe({
-      next: () => {
-        this.snackBar.open(`Booking ${action} successfully!`, '', {
-          duration: 3000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center',
-          panelClass: 'success-snackbar'
-        });
-        this.bookingSaved.emit(bookingData);
-        this.refreshList.emit();
-        this.close();
+      this.bookingService.addBooking(bookingDTO).subscribe({
+        next: (response) => {
+          this.snackBar.open('Vehicle booked successfully!', '', {
+            duration: 3000,
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            panelClass: 'success-snackbar'
+          });
+          this.bookingSaved.emit(response);
+          this.refreshList.emit();
+          this.close();
+        },
+        error: (err) => {
+          console.error('Error creating booking:', err);
+          let errorMessage = 'Failed to book vehicle';
+          if (err.error && err.error.message) {
+            errorMessage = err.error.message;
+          } else if (typeof err.error === 'string') {
+            errorMessage = err.error;
+          }
+          this.snackBar.open(errorMessage, '', {
+            duration: 5000,
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            panelClass: 'error-snackbar'
+          });
+        }
+      });
+    }
+  }
+
+  loadVehicles(): void {
+    this.loadingVehicles = true;
+    this.vehicleService.getAllVehicles().subscribe({
+      next: (data) => {
+        if (Array.isArray(data)) {
+          this.vehicles = data;
+        } else {
+          this.vehicles = [];
+        }
+        this.loadingVehicles = false;
       },
-      error: (err) => {
-        console.error(`Error ${action} booking:`, err);
-        this.snackBar.open(`Booking ${action} successfully! (Demo mode)`, '', {
-          duration: 3000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center'
-        });
-        this.bookingSaved.emit(bookingData);
-        this.refreshList.emit();
-        this.close();
+      error: (error) => {
+        console.error('Error loading vehicles:', error);
+        this.vehicles = [];
+        this.loadingVehicles = false;
       }
     });
+  }
+
+  onVehicleSelected(event: any): void {
+    const selectedVehicleId = event.target.value;
+    const selectedVehicle = this.vehicles.find(v => v.id?.toString() === selectedVehicleId);
+
+    if (selectedVehicle) {
+      // Auto-populate fields based on selected vehicle
+      this.bookingForm.patchValue({
+        vehicleId: selectedVehicle.vehicleId || selectedVehicle.id,
+        vehicleType: selectedVehicle.vehicleType,
+        vehicleNo: selectedVehicle.vehicleRegNo,
+        driverName: selectedVehicle.driverMob ? `Driver (${selectedVehicle.driverMob})` : ''
+      });
+    }
   }
 
   close() {

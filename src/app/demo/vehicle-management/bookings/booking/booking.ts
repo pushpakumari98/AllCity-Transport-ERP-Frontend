@@ -4,6 +4,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { BookingService } from 'src/app/demo/vehicle-management/bookings/services/booking.service';
+import { VehicleService } from '../../services/vehicle.service';
+import { Vehicle } from '../../../../model/vehicle.model';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { BookingStatus } from '../../../../enums/booking-status.enum';
 import { VehicleStatus } from '../../../../enums/vehicle-status.enum';
@@ -22,47 +24,26 @@ import { VehicleType } from '../../../../enums/vehicle-type.enum';
 })
 export class Booking implements OnInit {
 
-  bookingForm: FormGroup;
-  availableVehicles: any[] = [];
+  allVehicles: Vehicle[] = [];
   loadingVehicles = false;
+  expandedVehicleId: number | null = null; // Track which vehicle row is expanded
 
   // Enum options for dropdowns
   vehicleTypeOptions = Object.values(VehicleType);
   vehicleStatusOptions = Object.values(VehicleStatus);
   bookingStatusOptions = Object.values(BookingStatus);
 
-  // Enum values for template
-  vehicleTypes = Object.values(VehicleType);
-  vehicleStatuses = Object.values(VehicleStatus);
-  bookingStatuses = Object.values(BookingStatus);
+  // Store booking forms for each vehicle
+  vehicleBookingForms: { [vehicleId: number]: FormGroup } = {};
 
   constructor(
     private fb: FormBuilder,
     private bookingService: BookingService,
+    private vehicleService: VehicleService,
     private router: Router,
     private snackBar: MatSnackBar,
     // private notificationService: NotificationService
-  ) {
-    this.bookingForm = this.fb.group({
-      bookingDate: [new Date().toISOString().split('T')[0], Validators.required], // Default to today
-      startedFrom: ['', Validators.required],
-      destination: ['', Validators.required],
-      vehicleType: [{value: '', disabled: true}], // Auto-populated from selected vehicle
-      vehicleId: ['', Validators.required],
-      vehicleNo: [{value: '', disabled: true}], // Auto-populated from selected vehicle
-      driverName: [''],
-      bookingHire: [0, Validators.required],
-      bookingAdvance: [0],
-      bookingBalance: [0],
-      bookingReceivedDate: [''],
-      detain: [''],
-      podReceived: [null],
-      podDocument: [''],
-      lorryBalancePaidDate: [''],
-      bookingStatus: ['PENDING', Validators.required],
-      vehicleStatus: ['AVAILABLE', Validators.required]
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.loadAvailableVehicles();
@@ -72,38 +53,60 @@ export class Booking implements OnInit {
 
 
   loadAvailableVehicles(): void {
-    this.bookingService.getAvailableVehicles().subscribe({
+    this.loadingVehicles = true;
+    this.vehicleService.getAllVehicles().subscribe({
       next: (vehicles) => {
-        // Filter to ensure only vehicles with AVAILABLE status are shown
-        this.availableVehicles = vehicles.filter(v => v.vehicleStatus === 'AVAILABLE');
+        if (Array.isArray(vehicles)) {
+          this.allVehicles = vehicles;
+        } else {
+          this.allVehicles = [];
+        }
+        this.loadingVehicles = false;
+
+        // Initialize booking forms for each vehicle
+        this.initializeBookingForms();
       },
-      error: () => {
-        this.snackBar.open('No available vehicles', '', { duration: 3000 });
+      error: (error) => {
+        console.error('Error loading vehicles:', error);
+        this.allVehicles = [];
+        this.loadingVehicles = false;
+        this.snackBar.open('Failed to load vehicles', '', { duration: 3000 });
       }
     });
   }
 
-  onVehicleChange(event: any): void {
-    const selectedVehicleId = event.target.value;
-    const selectedVehicle = this.availableVehicles.find(v => v.id == selectedVehicleId);
-
-    if (selectedVehicle) {
-      this.bookingForm.patchValue({
-        vehicleType: selectedVehicle.vehicleType,
-        vehicleNo: selectedVehicle.vehicleRegNo
+  private initializeBookingForms(): void {
+    this.allVehicles.forEach(vehicle => {
+      this.vehicleBookingForms[vehicle.id!] = this.fb.group({
+        bookingDate: [new Date().toISOString().split('T')[0], Validators.required],
+        startedFrom: ['', Validators.required],
+        destination: ['', Validators.required],
+        driverName: [''],
+        bookingHire: [0, Validators.required],
+        bookingAdvance: [0],
+        bookingBalance: [0],
+        bookingReceivedDate: [''],
+        detain: [''],
+        podReceived: [null],
+        podDocument: [''],
+        lorryBalancePaidDate: [''],
+        bookingStatus: ['PENDING', Validators.required],
+        vehicleStatus: ['BOOKED', Validators.required] // Set to BOOKED when booking
       });
-    } else {
-      this.bookingForm.patchValue({
-        vehicleType: '',
-        vehicleNo: ''
-      });
-    }
+    });
   }
 
+  toggleBookingForm(vehicleId: number): void {
+    this.expandedVehicleId = this.expandedVehicleId === vehicleId ? null : vehicleId;
+  }
 
+  getBookingForm(vehicleId: number): FormGroup {
+    return this.vehicleBookingForms[vehicleId];
+  }
 
-  onSubmit() {
-    if (this.bookingForm.invalid) {
+  submitBooking(vehicleId: number): void {
+    const form = this.vehicleBookingForms[vehicleId];
+    if (form.invalid) {
       this.snackBar.open('Please fill all required fields!', '', {
         duration: 3000,
         verticalPosition: 'top',
@@ -113,13 +116,11 @@ export class Booking implements OnInit {
       return;
     }
 
-    const formValue = this.bookingForm.value;
-
-    // Find the selected vehicle by ID
-    const selectedVehicle = this.availableVehicles.find(v => v.id == formValue.vehicleId);
+    const formValue = form.value;
+    const selectedVehicle = this.allVehicles.find(v => v.id == vehicleId);
 
     if (!selectedVehicle) {
-      this.snackBar.open('Selected vehicle not found!', '', {
+      this.snackBar.open('Vehicle not found!', '', {
         duration: 3000,
         verticalPosition: 'top',
         horizontalPosition: 'center',
@@ -134,7 +135,7 @@ export class Booking implements OnInit {
       bookingDate: formValue.bookingDate,
       startedFrom: formValue.startedFrom,
       destination: formValue.destination,
-      vehicleId: formValue.vehicleId,
+      vehicleId: vehicleId,
       vehicleNo: selectedVehicle.vehicleRegNo,
       vehicleType: selectedVehicle.vehicleType,
       driverName: formValue.driverName,
@@ -150,10 +151,8 @@ export class Booking implements OnInit {
       vehicleStatus: formValue.vehicleStatus
     };
 
-
     console.log('Submitting booking with payload:', payload);
 
-    // Try to save to backend API first
     this.bookingService.addBooking(payload).subscribe({
       next: (response) => {
         console.log('Booking created successfully on backend:', response);
@@ -163,12 +162,17 @@ export class Booking implements OnInit {
           horizontalPosition: 'center',
           panelClass: 'success-snackbar'
         });
+
+        // Remove the booked vehicle from the list
+        this.allVehicles = this.allVehicles.filter(v => v.id !== vehicleId);
+        delete this.vehicleBookingForms[vehicleId];
+        this.expandedVehicleId = null;
+
+        // Navigate to booked vehicles list
         this.router.navigate(['/app/booked-vehicles']);
       },
       error: (error) => {
         console.error('Backend not available, saving to localStorage:', error);
-
-        // Fallback: Save to localStorage for offline/demo mode
         this.snackBar.open('Backend not available. Booking saved locally!', '', {
           duration: 3000,
           verticalPosition: 'top',
@@ -176,12 +180,27 @@ export class Booking implements OnInit {
           panelClass: 'warning-snackbar'
         });
 
-        // Save the new booking to localStorage for persistence
-       this.snackBar.open(error.error.message || 'Booking failed', '')
-       this.router.navigate(['/booked-vehicles']);
+        // Remove the booked vehicle from the list even in offline mode
+        this.allVehicles = this.allVehicles.filter(v => v.id !== vehicleId);
+        delete this.vehicleBookingForms[vehicleId];
+        this.expandedVehicleId = null;
+
+        this.router.navigate(['/app/booked-vehicles']);
       }
     });
   }
+
+  cancelBooking(vehicleId: number): void {
+    this.expandedVehicleId = null;
+    // Reset the form
+    this.vehicleBookingForms[vehicleId].reset({
+      bookingDate: new Date().toISOString().split('T')[0],
+      bookingStatus: 'PENDING',
+      vehicleStatus: 'BOOKED'
+    });
+  }
+
+
 
   viewBookedVehicles() {
     this.router.navigate(['/app/booked-vehicles']);

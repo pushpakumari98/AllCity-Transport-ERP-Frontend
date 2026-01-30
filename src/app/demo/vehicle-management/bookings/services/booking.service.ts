@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { VehicleBooking } from '../models/vehicle-booking.model';
+import { VehicleBooking, VehicleBookingDTO } from '../models/vehicle-booking.model';
 import { Vehicle } from '../../../../model/vehicle.model';
 
 @Injectable({ providedIn: 'root' })
@@ -28,8 +28,8 @@ export class BookingService {
   }
 
   // ✅ Add booking (matches backend: @PostMapping("/bookvehicle"))
-  addBooking(booking: VehicleBooking): Observable<VehicleBooking> {
-    return this.http.post<VehicleBooking>(`${this.bookingsUrl}/bookvehicle`, booking);
+  addBooking(bookingDTO: VehicleBookingDTO): Observable<VehicleBooking> {
+    return this.http.post<VehicleBooking>(`${this.bookingsUrl}/bookvehicle`, bookingDTO);
   }
 
   // ✅ Update booking (matches backend: @PutMapping("/{id}"))

@@ -31,3 +31,13 @@ export interface VehicleBooking {
   lorryBalancePaidDate?: string;
   bookingDate?: string;
 }
+
+export interface VehicleBookingDTO {
+  vehicleId: number;
+  startedFrom: string;
+  destination: string;
+  driverName: string;
+  bookingHire: number;
+  bookingAdvance: number;
+  bookingBalance: number;
+}

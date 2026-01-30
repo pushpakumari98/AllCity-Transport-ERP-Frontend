@@ -17,10 +17,18 @@
               </div>
             </div>
             <div class="col-md-4 mb-3">
-              <label>Vehicle ID</label>
-              <input formControlName="vehicleId" class="form-control" type="number" placeholder="Enter vehicle ID" />
+              <label>Select Vehicle</label>
+              <select formControlName="vehicleId" class="form-control" (change)="onVehicleSelected($event)">
+                <option [ngValue]="null">-- Select Vehicle --</option>
+                <option *ngFor="let vehicle of vehicles" [ngValue]="vehicle.id">
+                  {{ vehicle.vehicleRegNo }} - {{ vehicle.vehicleType }} ({{ vehicle.vehicleId }})
+                </option>
+              </select>
               <div *ngIf="bookingForm.get('vehicleId')?.invalid && bookingForm.get('vehicleId')?.touched" class="text-danger mt-1">
-                <small>Vehicle ID is required</small>
+                <small>Vehicle selection is required</small>
+              </div>
+              <div *ngIf="loadingVehicles" class="mt-1">
+                <small class="text-muted">Loading vehicles...</small>
               </div>
             </div>
 
@@ -60,10 +68,7 @@
 
             <div class="col-md-4 mb-3">
               <label>Vehicle Type</label>
-              <select class="form-control" formControlName="vehicleType">
-                <option [ngValue]="null">-- Select Vehicle Type --</option>
-                <option *ngFor="let type of vehicleTypes" [ngValue]="type">{{ type }}</option>
-              </select>
+              <input formControlName="vehicleType" class="form-control" readonly />
               <div *ngIf="bookingForm.get('vehicleType')?.invalid && bookingForm.get('vehicleType')?.touched" class="text-danger mt-1">
                 <small>Vehicle type is required</small>
               </div>
@@ -71,7 +76,7 @@
 
             <div class="col-md-4 mb-3">
               <label>Vehicle No</label>
-              <input formControlName="vehicleNo" class="form-control" type="text" placeholder="Enter vehicle number" />
+              <input formControlName="vehicleNo" class="form-control" readonly />
               <div *ngIf="bookingForm.get('vehicleNo')?.invalid && bookingForm.get('vehicleNo')?.touched" class="text-danger mt-1">
                 <small>Vehicle no is required</small>
               </div>
@@ -79,7 +84,7 @@
 
             <div class="col-md-4 mb-3">
               <label>Driver Name</label>
-              <input formControlName="driverName" class="form-control" placeholder="Enter driver name" />
+              <input formControlName="driverName" class="form-control" readonly />
               <div *ngIf="bookingForm.get('driverName')?.invalid && bookingForm.get('driverName')?.touched" class="text-danger mt-1">
                 <small>Driver name is required</small>
               </div>
@@ -89,7 +94,7 @@
             <div class="col-md-4 mb-3">
               <label>Booking Status</label>
               <select class="form-control" formControlName="bookingStatus">
-                <option *ngFor="let status of bookingStatuses" [ngValue]="status">{{ status }}</option>
+                <option *ngFor="let status of bookingStatus" [ngValue]="status">{{ status }}</option>
               </select>
               <div *ngIf="bookingForm.get('bookingStatus')?.invalid && bookingForm.get('bookingStatus')?.touched" class="text-danger mt-1">
                 <small>Booking status is required</small>
