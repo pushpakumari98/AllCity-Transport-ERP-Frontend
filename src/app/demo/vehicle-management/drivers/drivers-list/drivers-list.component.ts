@@ -79,11 +79,8 @@ export class DriversListComponent implements OnInit {
 
 
   addDriver() {
-    // Show the driver form and hide the list (form becomes main content)
-    this.editMode = false;
-    this.selectedDriver = undefined;
-    this.showDriverModal = true;
-    this.showList = false; // Hide the list when showing the form
+    // Navigate to the dedicated driver form page
+    this.router.navigate(['/app/drivers']);
   }
 
   updateDriver(driver: Driver) {
