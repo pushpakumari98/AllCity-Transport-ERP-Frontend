@@ -9,9 +9,9 @@
         <!-- 3 COLUMN GRID -->
         <div class="row">
           <div class="col-md-4 mb-3">
-            <label for="serialNumber">Sl. No</label>
-            <input type="text" id="serialNumber" formControlName="serialNumber" class="form-control" placeholder="Enter Sl. No" />
-            <div *ngIf="driverForm.get('serialNumber')?.invalid && driverForm.get('serialNumber')?.touched" class="text-danger mt-1">
+            <label for="serialNo">Sl. No</label>
+            <input type="text" id="serialNo" formControlName="serialNo" class="form-control" placeholder="Enter Sl. No" />
+            <div *ngIf="driverForm.get('serialNo')?.invalid && driverForm.get('serialNo')?.touched" class="text-danger mt-1">
               <small>Sl. No is required</small>
             </div>
           </div>
@@ -25,9 +25,9 @@
           </div>
 
           <div class="col-md-4 mb-3">
-            <label for="vehicleNumber">Vehicle No</label>
-            <input type="text" id="vehicleNumber" formControlName="vehicleNumber" class="form-control" placeholder="Enter Vehicle No" />
-            <div *ngIf="driverForm.get('vehicleNumber')?.invalid && driverForm.get('vehicleNumber')?.touched" class="text-danger mt-1">
+            <label for="vehicleNo">Vehicle No</label>
+            <input type="text" id="vehicleNo" formControlName="vehicleNo" class="form-control" placeholder="Enter Vehicle No" />
+            <div *ngIf="driverForm.get('vehicleNo')?.invalid && driverForm.get('vehicleNo')?.touched" class="text-danger mt-1">
               <small>Vehicle No is required</small>
             </div>
           </div>
@@ -157,9 +157,9 @@
           </thead>
           <tbody>
             <tr *ngFor="let driver of drivers; trackBy: trackByDriverId">
-              <td class="text-center">{{ driver.serialNumber }}</td>
+              <td class="text-center">{{ driver.serialNo }}</td>
               <td class="text-center">{{ driver.date }}</td>
-              <td class="text-center">{{ driver.vehicleNumber }}</td>
+              <td class="text-center">{{ driver.vehicleNo }}</td>
               <td class="text-center">{{ driver.driverName }}</td>
               <td class="text-center">{{ driver.startedFrom }}</td>
               <td class="text-center">{{ driver.destination }}</td>

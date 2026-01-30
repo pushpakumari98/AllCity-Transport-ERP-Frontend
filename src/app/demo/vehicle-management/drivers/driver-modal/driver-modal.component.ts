@@ -42,9 +42,9 @@ export class DriverModalComponent implements OnInit, OnChanges {
 
   private initializeForm() {
     this.driverForm = this.fb.group({
-      serialNumber: ['', Validators.required],
+      serialNo: ['', Validators.required],
       date: ['', Validators.required],
-      vehicleNumber: ['', Validators.required],
+      vehicleNo: ['', Validators.required],
       driverName: ['', Validators.required],
       startedFrom: ['', Validators.required],
       destination: ['', Validators.required],

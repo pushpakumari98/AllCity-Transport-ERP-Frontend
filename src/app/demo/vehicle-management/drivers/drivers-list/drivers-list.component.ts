@@ -44,6 +44,7 @@ export class DriversListComponent implements OnInit {
 
   private initializeForm() {
     this.driverForm = this.fb.group({
+      serialNo: ['', Validators.required],
       date: ['', Validators.required],
       vehicleNo: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/)]],
       driverName: [''],
