@@ -80,7 +80,7 @@ export class DriversListComponent implements OnInit {
 
   addDriver() {
     // Navigate to the dedicated driver form page
-    this.router.navigate(['/drivers']);
+    this.router.navigate(['/app/drivers']);
   }
 
   updateDriver(driver: Driver) {
