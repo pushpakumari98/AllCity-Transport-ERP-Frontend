@@ -1,102 +1,47 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Driver } from '../models/driver.model';
+import { environment } from '../../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DriverService {
-  private storageKey = 'drivers';
-  private apiUrl = 'https://allcity-transport-erp.onrender.com/api/drivers'; // Assuming backend endpoint
+  private apiUrl = `${environment.apiUrl}/api/drivers`;
 
   constructor(private http: HttpClient) {}
 
   // Add driver
   addDriver(driver: Driver): Observable<Driver> {
-    return new Observable(observer => {
-      this.http.post<Driver>(`${this.apiUrl}/create`, driver).subscribe({
-        next: (result) => {
-          observer.next(result);
-          observer.complete();
-        },
-        error: () => {
-          // Fallback to local storage
-          driver.id = Date.now();
-          this.addDriverLocally(driver);
-          observer.next(driver);
-          observer.complete();
-        }
-      });
-    });
+    return this.http.post<Driver>(this.apiUrl, driver);
   }
 
   // Get all drivers
   getAllDrivers(): Observable<Driver[]> {
-    return new Observable(observer => {
-      this.http.get<Driver[]>(`${this.apiUrl}`).subscribe({
-        next: (drivers) => observer.next(drivers),
-        error: () => {
-          // Fallback to local storage
-          const localDrivers = this.getAllDriversLocally();
-          observer.next(localDrivers);
-        },
-        complete: () => observer.complete()
-      });
-    });
+    return this.http.get<Driver[]>(this.apiUrl);
   }
 
   // Update driver
   updateDriver(driver: Driver): Observable<Driver> {
-    return new Observable(observer => {
-      this.http.put<Driver>(`${this.apiUrl}/${driver.id}`, driver).subscribe({
-        next: (updatedDriver) => observer.next(updatedDriver),
-        error: () => {
-          // Fallback to local storage
-          this.updateDriverLocally(driver);
-          observer.next(driver);
-        },
-        complete: () => observer.complete()
-      });
-    });
+    return this.http.put<Driver>(`${this.apiUrl}/${driver.id}`, driver);
   }
 
   // Delete driver
   deleteDriver(id: number): Observable<void> {
-    return new Observable(observer => {
-      this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
-        next: () => observer.next(),
-        error: () => {
-          // Fallback to local storage
-          this.deleteDriverLocally(id);
-          observer.next();
-        },
-        complete: () => observer.complete()
-      });
-    });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  private getAllDriversLocally(): Driver[] {
-    const stored = localStorage.getItem(this.storageKey);
-    return stored ? JSON.parse(stored) : [];
+  // Search by serial number
+  getBySerialNumber(serialNo: number): Observable<Driver> {
+    return this.http.get<Driver>(`${this.apiUrl}/serial/${serialNo}`);
   }
 
-  private addDriverLocally(driver: Driver): void {
-    const drivers = this.getAllDriversLocally();
-    drivers.push(driver);
-    localStorage.setItem(this.storageKey, JSON.stringify(drivers));
+  // Search by carry material type
+  getByCarryMaterialType(carryMaterialType: string): Observable<Driver[]> {
+    return this.http.get<Driver[]>(`${this.apiUrl}/material/${carryMaterialType}`);
   }
 
-  private updateDriverLocally(driver: Driver): void {
-    const drivers = this.getAllDriversLocally();
-    const index = drivers.findIndex(d => d.id === driver.id);
-    if (index !== -1) {
-      drivers[index] = driver;
-      localStorage.setItem(this.storageKey, JSON.stringify(drivers));
-    }
-  }
-
-  private deleteDriverLocally(id: number): void {
-    const drivers = this.getAllDriversLocally();
-    const filtered = drivers.filter(d => d.id !== id);
-    localStorage.setItem(this.storageKey, JSON.stringify(filtered));
+  // Search by vehicle number
+  getByVehicleNumber(vehicleNo: string): Observable<Driver[]> {
+    return this.http.get<Driver[]>(`${this.apiUrl}/vehicle/${vehicleNo}`);
   }
 }

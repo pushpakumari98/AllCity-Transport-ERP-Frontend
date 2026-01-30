@@ -31,14 +31,16 @@ export class DriverComponent {
     private notificationService: NotificationService
   ) {
     this.driverForm = this.fb.group({
-      serialNumber: ['', Validators.required],
       date: ['', Validators.required],
-      vehicleNumber: ['', Validators.required],
+      vehicleNo: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/)]],
       driverName: ['', Validators.required],
       startedFrom: ['', Validators.required],
       destination: ['', Validators.required],
       carryMaterialType: ['', Validators.required],
-      contactNumber: ['', Validators.required],
+      contactNumber: ['', [
+        Validators.required,
+        Validators.pattern(/^[0-9]{10}$/)
+      ]],
       address: ['', Validators.required]
     });
   }
@@ -46,7 +48,12 @@ export class DriverComponent {
   onSubmit() {
     if (this.driverForm.invalid) return;
 
-    const payload = this.driverForm.value;
+    const payload = {
+      ...this.driverForm.value,
+      date: new Date(this.driverForm.value.date)
+              .toISOString()
+              .split('T')[0]
+    };
 
     this.driverService.addDriver(payload).subscribe({
       next: () => {

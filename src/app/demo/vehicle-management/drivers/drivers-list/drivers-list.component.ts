@@ -22,7 +22,6 @@ export class DriversListComponent implements OnInit {
   loading = false;
   showConfirmationDialog = false;
   driverToDelete?: Driver;
-  hasLocalUpdates = false;
   showDriverModal = false;
   showList = false;
   editMode = false;
@@ -45,14 +44,13 @@ export class DriversListComponent implements OnInit {
 
   private initializeForm() {
     this.driverForm = this.fb.group({
-      serialNumber: ['', Validators.required],
       date: ['', Validators.required],
-      vehicleNumber: ['', Validators.required],
-      driverName: ['', Validators.required],
+      vehicleNo: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/)]],
+      driverName: [''],
       startedFrom: ['', Validators.required],
       destination: ['', Validators.required],
       carryMaterialType: ['', Validators.required],
-      contactNumber: ['', Validators.required],
+      contactNumber: [''],
       address: ['', Validators.required]
     });
   }
@@ -63,15 +61,12 @@ export class DriversListComponent implements OnInit {
       next: (res) => {
         console.log("DRIVERS BACKEND RESPONSE:", res);
         this.drivers = res;
-        this.hasLocalUpdates = false;
         this.loading = false;
       },
       error: (err) => {
         console.error("Error fetching drivers:", err);
-        // Load mock data for demonstration when backend is not available
-        this.loadMockData();
         this.loading = false;
-        this.snackBar.open('Loaded sample drivers data for demonstration', '', {
+        this.snackBar.open('Error loading drivers data', '', {
           duration: 3000,
           verticalPosition: 'top',
           horizontalPosition: 'center'
@@ -80,35 +75,6 @@ export class DriversListComponent implements OnInit {
     });
   }
 
-  private loadMockData() {
-    this.drivers = [
-      {
-        id: 1,
-        serialNumber: "D001",
-        date: "2025-12-01",
-        vehicleNumber: "V001",
-        driverName: "John Doe",
-        startedFrom: "Mumbai",
-        destination: "Delhi",
-        carryMaterialType: "Electronics",
-        contactNumber: "9876543210",
-        address: "123 Main St, Mumbai",
-        document: "data:application/pdf;base64,dummy"
-      },
-      {
-        id: 2,
-        serialNumber: "D002",
-        date: "2025-12-02",
-        vehicleNumber: "V002",
-        driverName: "Jane Smith",
-        startedFrom: "Pune",
-        destination: "Bangalore",
-        carryMaterialType: "Machinery",
-        contactNumber: "9876543211",
-        address: "456 Elm St, Pune"
-      }
-    ];
-  }
 
   addDriver() {
     // Navigate to the dedicated driver form page
@@ -134,10 +100,19 @@ export class DriversListComponent implements OnInit {
         next: () => {
           this.removeDriverFromList(this.driverToDelete!.id!);
           this.driverToDelete = undefined;
+          this.snackBar.open('Driver deleted successfully!', '', {
+            duration: 3000,
+            verticalPosition: 'top',
+            horizontalPosition: 'center'
+          });
         },
         error: (err) => {
           console.error('Error deleting driver:', err);
-          this.removeDriverFromList(this.driverToDelete!.id!); // Remove anyway for demo
+          this.snackBar.open('Error deleting driver', '', {
+            duration: 3000,
+            verticalPosition: 'top',
+            horizontalPosition: 'center'
+          });
           this.driverToDelete = undefined;
         }
       });
@@ -150,15 +125,11 @@ export class DriversListComponent implements OnInit {
   }
 
   private removeDriverFromList(driverId: number) {
-    if (!this.hasLocalUpdates) {
-      this.drivers = [...this.drivers];
-      this.hasLocalUpdates = true;
-    }
     this.drivers = this.drivers.filter(d => d.id !== driverId);
   }
 
   trackByDriverId(index: number, driver: Driver): string {
-    return driver.serialNumber;
+    return driver.serialNo?.toString() || driver.id?.toString() || index.toString();
   }
 
   closeDriverModal() {
@@ -175,7 +146,7 @@ export class DriversListComponent implements OnInit {
     if (this.driverForm.invalid) return;
 
     const payload = this.driverForm.value;
-    const driverData = this.editMode ? { ...this.selectedDriver, ...payload } : { ...payload, id: Date.now() };
+    const driverData = this.editMode ? { ...this.selectedDriver, ...payload } : payload;
     const observable = this.editMode
       ? this.driverService.updateDriver(driverData)
       : this.driverService.addDriver(driverData);
@@ -189,20 +160,16 @@ export class DriversListComponent implements OnInit {
           verticalPosition: 'top',
           horizontalPosition: 'center'
         });
-        // After saving, show both form and list
-        this.showList = true;
+        this.closeDriverModal();
         this.loadDrivers();
       },
       error: (err) => {
         console.error(`Error ${action} driver:`, err);
-        this.snackBar.open(`Driver ${action} successfully! (Demo mode)`, '', {
+        this.snackBar.open(`Error ${action} driver`, '', {
           duration: 3000,
           verticalPosition: 'top',
           horizontalPosition: 'center'
         });
-        // After saving, show both form and list
-        this.showList = true;
-        this.loadDrivers();
       }
     });
   }
@@ -223,9 +190,9 @@ export class DriversListComponent implements OnInit {
   // Export methods
   exportToCSV() {
     const data = this.drivers.map(driver => [
-      driver.serialNumber || '',
+      driver.serialNo || '',
       driver.date || '',
-      driver.vehicleNumber || '',
+      driver.vehicleNo || '',
       driver.driverName || '',
       driver.startedFrom || '',
       driver.destination || '',
@@ -262,7 +229,7 @@ export class DriversListComponent implements OnInit {
       pdf.text('Sl.No | Driver Name | Vehicle | Contact', 20, y);
       y += 20;
       this.drivers.forEach(driver => {
-        pdf.text(`${driver.serialNumber} | ${driver.driverName} | ${driver.vehicleNumber} | ${driver.contactNumber}`, 20, y);
+        pdf.text(`${driver.serialNo} | ${driver.driverName} | ${driver.vehicleNo} | ${driver.contactNumber}`, 20, y);
         y += 10;
         if (y > 280) {
           pdf.addPage();
@@ -283,7 +250,7 @@ export class DriversListComponent implements OnInit {
             <tr>
               <th>Sl. No</th><th>Date</th><th>Vehicle No</th><th>Driver Name</th><th>Started From</th><th>To</th><th>Material Type</th><th>Contact No</th><th>Address</th>
             </tr>
-            ${this.drivers.map(d => `<tr><td>${d.serialNumber}</td><td>${d.date}</td><td>${d.vehicleNumber}</td><td>${d.driverName}</td><td>${d.startedFrom}</td><td>${d.destination}</td><td>${d.carryMaterialType}</td><td>${d.contactNumber}</td><td>${d.address}</td></tr>`).join('')}
+            ${this.drivers.map(d => `<tr><td>${d.serialNo}</td><td>${d.date}</td><td>${d.vehicleNo}</td><td>${d.driverName}</td><td>${d.startedFrom}</td><td>${d.destination}</td><td>${d.carryMaterialType}</td><td>${d.contactNumber}</td><td>${d.address}</td></tr>`).join('')}
           </table>
         </body>
       </html>
@@ -312,7 +279,7 @@ export class DriversListComponent implements OnInit {
               </tr>
             </thead>
             <tbody>
-              ${this.drivers.map(d => `<tr><td style="border: 1px solid #ddd; padding: 8px;">${d.serialNumber}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.date}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.driverName}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.vehicleNumber}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.contactNumber}</td></tr>`).join('')}
+              ${this.drivers.map(d => `<tr><td style="border: 1px solid #ddd; padding: 8px;">${d.serialNo}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.date}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.driverName}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.vehicleNo}</td><td style="border: 1px solid #ddd; padding: 8px;">${d.contactNumber}</td></tr>`).join('')}
             </tbody>
           </table>
         </div>

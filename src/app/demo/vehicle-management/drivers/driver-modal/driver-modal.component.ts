@@ -68,7 +68,12 @@ export class DriverModalComponent implements OnInit, OnChanges {
   saveDriver() {
     if (this.driverForm.invalid) return;
 
-    const payload = this.driverForm.value;
+    const payload = {
+      ...this.driverForm.value,
+      date: new Date(this.driverForm.value.date)
+        .toISOString()
+        .split('T')[0]
+    };
     const driverData = this.editMode ? { ...this.driverData, ...payload } : { ...payload, id: Date.now() };
     const observable = this.editMode
       ? this.driverService.updateDriver(driverData)

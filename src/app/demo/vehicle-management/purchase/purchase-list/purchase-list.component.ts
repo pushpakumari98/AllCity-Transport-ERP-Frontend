@@ -73,7 +73,7 @@ export class PurchaseListComponent implements OnInit {
   /* ================= NAVIGATION ================= */
 
   addPurchase(): void {
-    this.router.navigate(['/purchases']);
+    this.router.navigate(['/app/purchases']);
   }
 
   updatePurchase(purchase: VehiclePurchase): void {

@@ -90,9 +90,9 @@ export class DriverReportsComponent implements OnInit {
     this.drivers = [
       {
         id: 1,
-        serialNumber: "DRV001",
+        serialNo: 1001,
         date: new Date().toISOString().split('T')[0], // Today
-        vehicleNumber: "MH12-A1234",
+        vehicleNo: "MH12-A1234",
         driverName: "Rajesh Kumar",
         startedFrom: "Mumbai",
         destination: "Delhi",
@@ -102,9 +102,9 @@ export class DriverReportsComponent implements OnInit {
       },
       {
         id: 2,
-        serialNumber: "DRV002",
+        serialNo: 1002,
         date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
-        vehicleNumber: "MH12-B5678",
+        vehicleNo: "MH12-B5678",
         driverName: "Priya Sharma",
         startedFrom: "Pune",
         destination: "Bangalore",
@@ -114,9 +114,9 @@ export class DriverReportsComponent implements OnInit {
       },
       {
         id: 3,
-        serialNumber: "DRV003",
+        serialNo: 1003,
         date: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0], // Last week
-        vehicleNumber: "MH12-C9012",
+        vehicleNo: "MH12-C9012",
         driverName: "Amit Singh",
         startedFrom: "Ahmedabad",
         destination: "Mumbai",
@@ -165,7 +165,7 @@ export class DriverReportsComponent implements OnInit {
 
     this.totalDrivers = this.drivers.length;
   }
-
+  
   applyFilter() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -223,9 +223,9 @@ export class DriverReportsComponent implements OnInit {
     }
 
     const data = this.filteredDrivers.map(driver => [
-      driver.serialNumber || '',
+      driver.serialNo || '',
       driver.driverName || '',
-      driver.vehicleNumber || '',
+      driver.vehicleNo || '',
       driver.contactNumber || '',
       driver.startedFrom || '',
       driver.destination || '',
@@ -263,9 +263,9 @@ export class DriverReportsComponent implements OnInit {
       // Add driver data
       const driverData = this.filteredDrivers.map((driver, index) => ({
         A: index + 1,
-        B: driver.serialNumber,
+        B: driver.serialNo,
         C: driver.driverName,
-        D: driver.vehicleNumber,
+        D: driver.vehicleNo,
         E: driver.contactNumber,
         F: driver.startedFrom,
         G: driver.destination,
@@ -395,7 +395,7 @@ export class DriverReportsComponent implements OnInit {
       pdf.text('Sr.No | Serial No | Driver Name | Vehicle No | Contact', 20, y);
       y += 20;
       this.filteredDrivers.forEach((driver, index) => {
-        pdf.text(`${index + 1} | ${driver.serialNumber} | ${driver.driverName} | ${driver.vehicleNumber} | ${driver.contactNumber}`, 20, y);
+        pdf.text(`${index + 1} | ${driver.serialNo} | ${driver.driverName} | ${driver.vehicleNo} | ${driver.contactNumber}`, 20, y);
         y += 10;
         if (y > 280) {
           pdf.addPage();
@@ -426,7 +426,7 @@ export class DriverReportsComponent implements OnInit {
               <tr>
                 <th>Sr.No</th><th>Serial Number</th><th>Driver Name</th><th>Vehicle Number</th><th>Contact Number</th><th>From Location</th><th>Destination</th><th>Material Type</th><th>Address</th><th>Registration Date</th>
               </tr>
-              ${this.filteredDrivers.map((driver, index) => `<tr><td>${index + 1}</td><td>${driver.serialNumber}</td><td>${driver.driverName}</td><td>${driver.vehicleNumber}</td><td>${driver.contactNumber}</td><td>${driver.startedFrom}</td><td>${driver.destination}</td><td>${driver.carryMaterialType}</td><td>${driver.address}</td><td>${driver.date}</td></tr>`).join('')}
+              ${this.filteredDrivers.map((driver, index) => `<tr><td>${index + 1}</td><td>${driver.serialNo}</td><td>${driver.driverName}</td><td>${driver.vehicleNo}</td><td>${driver.contactNumber}</td><td>${driver.startedFrom}</td><td>${driver.destination}</td><td>${driver.carryMaterialType}</td><td>${driver.address}</td><td>${driver.date}</td></tr>`).join('')}
             </table>
           </body>
         </html>
@@ -561,9 +561,9 @@ export class DriverReportsComponent implements OnInit {
               ${this.filteredDrivers.map((driver, index) => `
                 <tr>
                   <td>${index + 1}</td>
-                  <td>${driver.serialNumber}</td>
+                  <td>${driver.serialNo}</td>
                   <td>${driver.driverName}</td>
-                  <td>${driver.vehicleNumber}</td>
+                  <td>${driver.vehicleNo}</td>
                   <td>${driver.contactNumber}</td>
                   <td>${driver.startedFrom}</td>
                   <td>${driver.destination}</td>
