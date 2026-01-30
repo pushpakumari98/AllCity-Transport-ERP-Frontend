@@ -97,7 +97,20 @@ export class DriversListComponent implements OnInit {
   onConfirmDelete() {
     if (this.driverToDelete) {
       this.showConfirmationDialog = false;
-      this.driverService.deleteDriver(this.driverToDelete.id!).subscribe({
+
+      // Check if driver has a valid id before attempting deletion
+      if (!this.driverToDelete.id) {
+        console.error('Cannot delete driver: missing id');
+        this.snackBar.open('Cannot delete driver: invalid data', '', {
+          duration: 3000,
+          verticalPosition: 'top',
+          horizontalPosition: 'center'
+        });
+        this.driverToDelete = undefined;
+        return;
+      }
+
+      this.driverService.deleteDriver(this.driverToDelete.id).subscribe({
         next: () => {
           this.removeDriverFromList(this.driverToDelete!.id!);
           this.driverToDelete = undefined;
