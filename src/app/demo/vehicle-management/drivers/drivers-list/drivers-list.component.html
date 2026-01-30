@@ -1,5 +1,5 @@
 <!-- Show form first (like bookings page) -->
-<div *ngIf="showDriverModal" class="page-container">
+<div *ngIf="showDriverModal && !editMode" class="page-container">
   <div class="card">
     <div class="card-header text-center">
       <h5>{{ editMode ? 'Edit' : 'Add' }} Driver</h5>
@@ -79,11 +79,6 @@
               <small>Address is required</small>
             </div>
           </div>
-
-          <div class="col-md-4 mb-3">
-            <label for="document">Upload Document</label>
-            <input type="file" id="document" class="form-control" (change)="onFileChange($event)" accept=".pdf,.jpg,.png,.doc,.docx" />
-          </div>
         </div>
 
         <!-- SUBMIT BUTTON -->
@@ -157,7 +152,6 @@
               <th class="text-center">Type of Material Carry</th>
               <th class="text-center">Contact No</th>
               <th class="text-center">Address</th>
-              <th class="text-center">Document</th>
               <th class="text-center">Action</th>
             </tr>
           </thead>
@@ -172,12 +166,6 @@
               <td class="text-center">{{ driver.carryMaterialType }}</td>
               <td class="text-center">{{ driver.contactNumber }}</td>
               <td class="text-center">{{ driver.address | slice:0:30 }}{{ driver.address?.length > 30 ? '...' : '' }}</td>
-              <td class="text-center">
-                <button *ngIf="driver.document" class="btn btn-sm btn-link" (click)="viewDocument(driver.document || '')">
-                  <i class="fa fa-file"></i> View
-                </button>
-                <span *ngIf="!driver.document">-</span>
-              </td>
               <td class="text-center">
                 <button class="btn btn-sm btn-warning me-2" (click)="updateDriver(driver)" title="Update">
                   <i class="fa fa-edit"></i>

@@ -9,10 +9,10 @@
       <form [formGroup]="driverForm" (ngSubmit)="saveDriver()">
         <div class="modal-body">
           <div class="row g-3">
-            <div class="col-md-4">
-              <label for="serialNumber">Sl. No</label>
-              <input type="text" id="serialNumber" formControlName="serialNumber" class="form-control" placeholder="Enter Sl. No" />
-            </div>
+          <div class="col-md-4" *ngIf="!editMode">
+            <label for="serialNumber">Sl. No</label>
+            <input type="text" id="serialNumber" formControlName="serialNumber" class="form-control" placeholder="Enter Sl. No" />
+          </div>
 
             <div class="col-md-4">
               <label for="date">Date</label>
