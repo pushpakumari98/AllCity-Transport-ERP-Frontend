@@ -79,8 +79,10 @@ export class DriversListComponent implements OnInit {
 
 
   addDriver() {
-    // Navigate to the dedicated driver form page
-    this.router.navigate(['/app/drivers']);
+    // Show the driver modal for adding new driver
+    this.editMode = false;
+    this.selectedDriver = undefined;
+    this.showDriverModal = true;
   }
 
   updateDriver(driver: Driver) {
