@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { lastValueFrom } from 'rxjs';
 import { DriverService } from '../services/driver.service';
 import { Driver } from '../models/driver.model';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -112,7 +113,12 @@ export class DriversListComponent implements OnInit {
 
       this.driverService.deleteDriver(this.driverToDelete.id).subscribe({
         next: () => {
+          // Remove driver from local list
           this.removeDriverFromList(this.driverToDelete!.id!);
+
+          // Resequence serial numbers for remaining drivers
+          this.resequenceSerialNumbers();
+
           this.driverToDelete = undefined;
           this.snackBar.open('Driver deleted successfully!', '', {
             duration: 3000,
@@ -140,6 +146,36 @@ export class DriversListComponent implements OnInit {
 
   private removeDriverFromList(driverId: number) {
     this.drivers = this.drivers.filter(d => d.id !== driverId);
+  }
+
+  private async resequenceSerialNumbers() {
+    try {
+      // Sort drivers by current serialNo to maintain order
+      this.drivers.sort((a, b) => (a.serialNo || 0) - (b.serialNo || 0));
+
+      // Update serial numbers sequentially starting from 1
+      for (let index = 0; index < this.drivers.length; index++) {
+        const driver = this.drivers[index];
+        const newSerialNo = index + 1;
+
+        if (driver.serialNo !== newSerialNo) {
+          const updatedDriver = { ...driver, serialNo: newSerialNo };
+          try {
+            await lastValueFrom(this.driverService.updateDriver(updatedDriver));
+            // Update local driver with new serialNo
+            driver.serialNo = newSerialNo;
+          } catch (err) {
+            console.error(`Failed to update serialNo for driver ${driver.id}:`, err);
+            // Continue with other updates even if one fails
+          }
+        }
+      }
+
+      // Trigger change detection by reassigning the array
+      this.drivers = [...this.drivers];
+    } catch (err) {
+      console.error('Error resequencing serial numbers:', err);
+    }
   }
 
   trackByDriverId(index: number, driver: Driver): string {
