@@ -47,75 +47,42 @@ export class SaleComponent implements OnInit {
     }
   }
 
-  onSubmit() {
-    if (this.saleForm.valid) {
-      const payload = this.saleForm.value;
-
-      // Generate vehicleId automatically for new sales (not for edits)
-      const vehicleId = this.isEditMode ? this.editingSale.vehicleId : this.generateVehicleId();
-
-      const saleData = this.isEditMode
-        ? { ...this.editingSale, ...payload }
-        : { ...payload, id: Date.now(), vehicleId };
-
-      if (this.isEditMode && this.editingSale.id) {
-        this.saleService.updateSale(saleData).subscribe(
-          response => {
-            console.log('Sale updated successfully:', response);
-            this.snackBar.open('Vehicle sale updated successfully', 'Close', {
-              duration: 3000,
-              verticalPosition: 'top',
-              horizontalPosition: 'center'
-            });
-            this.router.navigate(['/app/vehicle-sales-list']);
-          },
-          error => {
-            console.error('Error updating sale:', error);
-          }
-        );
-      } else {
-        // Remove vehicleId from request since backend generates it
-        const { vehicleId, id, ...requestData } = saleData;
-
-        this.saleService.addSale(requestData).subscribe(
-          response => {
-            console.log('Sale submitted successfully to backend:', response);
-            this.snackBar.open('Vehicle sold successfully!', 'Close', {
-              duration: 3000,
-              verticalPosition: 'top',
-              horizontalPosition: 'center'
-            });
-            // Trigger notification with backend response
-            // this.notificationService.notifySale(response);
-            this.saleForm.reset();
-            this.router.navigate(['/app/vehicle-sales-list']);
-          },
-          error => {
-            console.error('Backend error, saving to localStorage:', error);
-            this.snackBar.open('Vehicle sold successfully (saved locally)!', 'Close', {
-              duration: 3000,
-              verticalPosition: 'top',
-              horizontalPosition: 'center'
-            });
-            // Save to localStorage when backend fails
-            this.saveSaleToLocalStorage(saleData);
-            // Trigger notification
-            // this.notificationService.notifySale(saleData);
-            this.saleForm.reset();
-            this.router.navigate(['/app/vehicle-sales-list']);
-          }
-        );
-      }
-    } else {
-      console.log('Sale form is invalid');
-      this.snackBar.open('Please fill all required fields correctly.', 'Close', {
-        duration: 3000,
-        verticalPosition: 'top',
-        horizontalPosition: 'center',
-        panelClass: 'warning-snackbar'
-      });
-    }
+ onSubmit(): void {
+  if (this.saleForm.invalid) {
+    this.snackBar.open(
+      'Please fill all required fields correctly.',
+      'Close',
+      { duration: 3000 }
+    );
+    return;
   }
+
+  const formData = this.saleForm.value;
+
+  const request$ = this.isEditMode
+    ? this.saleService.updateSale({ ...formData, id: this.editingSale.id })
+    : this.saleService.addSale(formData);
+
+  request$.subscribe({
+    next: () => {
+      this.snackBar.open(
+        this.isEditMode ? 'Sale updated successfully!' : 'Vehicle sold successfully!',
+        'Close',
+        { duration: 3000 }
+      );
+
+      this.router.navigate(['/app/vehicle-sales-reports']);
+    },
+    error: () => {
+      this.snackBar.open(
+        'Failed to save sale',
+        'Close',
+        { duration: 3000 }
+      );
+    }
+  });
+}
+
 
   private generateVehicleId(): string {
     // Generate vehicle ID in format VH-XXXXXXXX (8 uppercase chars from UUID)
@@ -153,3 +120,4 @@ export class SaleComponent implements OnInit {
     this.router.navigate(['/app/vehicle-sales-list']);
   }
 }
+
