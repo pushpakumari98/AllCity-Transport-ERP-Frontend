@@ -54,12 +54,12 @@ export class VehicleSalesReportsComponent implements OnInit {
   }
 
   // ================= LOAD SALES =================
-  loadSales() {
+  loadSales(): void {
     this.loading = true;
 
     this.saleService.getAllSales().subscribe({
-      next: (res) => {
-        this.sales = res || [];
+      next: (sales) => {
+        this.sales = sales ?? [];
         this.calculateStats();
         this.applyFilter();
         this.loading = false;
@@ -79,12 +79,13 @@ export class VehicleSalesReportsComponent implements OnInit {
   }
 
   // ================= DATE HELPER =================
-  private parseDate(date: string): Date {
-    return new Date(date + 'T00:00:00'); // SAFE LocalDate parsing
+  private parseDate(date?: string): Date | null {
+    if (!date) return null;
+    return new Date(date + 'T00:00:00'); // Safe for LocalDate
   }
 
   // ================= STATS =================
-  calculateStats() {
+  calculateStats(): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -94,58 +95,66 @@ export class VehicleSalesReportsComponent implements OnInit {
     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
     const yearStart = new Date(today.getFullYear(), 0, 1);
 
-    this.todaySales = this.sales.filter(s =>
-      this.parseDate(s.date).getTime() === today.getTime()
-    ).length;
+    this.todaySales = this.sales.filter(s => {
+      const d = this.parseDate(s.date);
+      return d && d.getTime() === today.getTime();
+    }).length;
 
-    this.weekSales = this.sales.filter(s =>
-      this.parseDate(s.date) >= weekStart
-    ).length;
+    this.weekSales = this.sales.filter(s => {
+      const d = this.parseDate(s.date);
+      return d && d >= weekStart;
+    }).length;
 
-    this.monthSales = this.sales.filter(s =>
-      this.parseDate(s.date) >= monthStart
-    ).length;
+    this.monthSales = this.sales.filter(s => {
+      const d = this.parseDate(s.date);
+      return d && d >= monthStart;
+    }).length;
 
-    this.yearSales = this.sales.filter(s =>
-      this.parseDate(s.date) >= yearStart
-    ).length;
+    this.yearSales = this.sales.filter(s => {
+      const d = this.parseDate(s.date);
+      return d && d >= yearStart;
+    }).length;
 
     this.totalSales = this.sales.length;
   }
 
   // ================= FILTER =================
-  applyFilter() {
+  applyFilter(): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     switch (this.selectedFilter) {
 
       case 'today':
-        this.filteredSales = this.sales.filter(s =>
-          this.parseDate(s.date).getTime() === today.getTime()
-        );
+        this.filteredSales = this.sales.filter(s => {
+          const d = this.parseDate(s.date);
+          return d && d.getTime() === today.getTime();
+        });
         break;
 
       case 'thisWeek':
         const weekStart = new Date(today);
         weekStart.setDate(today.getDate() - today.getDay());
-        this.filteredSales = this.sales.filter(s =>
-          this.parseDate(s.date) >= weekStart
-        );
+        this.filteredSales = this.sales.filter(s => {
+          const d = this.parseDate(s.date);
+          return d && d >= weekStart;
+        });
         break;
 
       case 'thisMonth':
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-        this.filteredSales = this.sales.filter(s =>
-          this.parseDate(s.date) >= monthStart
-        );
+        this.filteredSales = this.sales.filter(s => {
+          const d = this.parseDate(s.date);
+          return d && d >= monthStart;
+        });
         break;
 
       case 'thisYear':
         const yearStart = new Date(today.getFullYear(), 0, 1);
-        this.filteredSales = this.sales.filter(s =>
-          this.parseDate(s.date) >= yearStart
-        );
+        this.filteredSales = this.sales.filter(s => {
+          const d = this.parseDate(s.date);
+          return d && d >= yearStart;
+        });
         break;
 
       default:
@@ -153,26 +162,27 @@ export class VehicleSalesReportsComponent implements OnInit {
     }
   }
 
-  onFilterChange() {
+  onFilterChange(): void {
     this.applyFilter();
   }
 
   // ================= DELETE =================
-  deleteSale(sale: VehicleSale) {
+  deleteSale(sale: VehicleSale): void {
     this.selectedSaleForDelete = sale;
     this.showConfirmationDialog = true;
   }
 
-  onConfirmDelete() {
-    if (!this.selectedSaleForDelete) return;
+  onConfirmDelete(): void {
+    if (!this.selectedSaleForDelete?.id) return;
 
-    this.saleService.deleteSale(this.selectedSaleForDelete.id!).subscribe({
+    this.saleService.deleteSale(this.selectedSaleForDelete.id).subscribe({
       next: () => {
         this.sales = this.sales.filter(
           s => s.id !== this.selectedSaleForDelete!.id
         );
-        this.applyFilter();
+
         this.calculateStats();
+        this.applyFilter();
 
         this.snackBar.open(
           'Sale deleted successfully',
@@ -193,17 +203,18 @@ export class VehicleSalesReportsComponent implements OnInit {
     });
   }
 
-  onCancelDelete() {
+  onCancelDelete(): void {
     this.showConfirmationDialog = false;
     this.selectedSaleForDelete = undefined;
   }
 
   // ================= EDIT (placeholder) =================
-  editSale(sale: VehicleSale) {
+  editSale(sale: VehicleSale): void {
     this.snackBar.open(
-      'Edit sale feature coming soon (ID: ' + sale.id + ')',
+      `Edit sale feature coming soon (ID: ${sale.id})`,
       'Close',
       { duration: 3000 }
     );
   }
 }
+
