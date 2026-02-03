@@ -1,0 +1,199 @@
+<div class="page-container">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>All Vehicles for Booking</h5>
+      <button type="button" class="btn btn-info" (click)="viewBookedVehicles()">
+        <i class="fa fa-list"></i> View Booked Vehicles
+      </button>
+    </div>
+
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="loadingVehicles" class="text-center py-4">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-2">Loading vehicles...</p>
+      </div>
+
+      <!-- Vehicles Table -->
+      <div *ngIf="!loadingVehicles && allVehicles.length > 0" class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="text-center">
+            <tr>
+              <th>Vehicle No</th>
+              <th>Vehicle Type</th>
+              <th>Capacity</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let vehicle of allVehicles">
+              <!-- Vehicle Row -->
+              <tr>
+                <td class="text-center">{{ vehicle.vehicleRegNo }}</td>
+                <td class="text-center">{{ vehicle.vehicleType }}</td>
+                <td class="text-center">{{ vehicle.capacity || 'N/A' }}</td>
+                <td class="text-center">
+                  <span class="badge bg-success">{{ vehicle.vehicleStatus }}</span>
+                </td>
+                <td class="text-center">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    (click)="toggleBookingForm(vehicle.id)">
+                    <i class="fa fa-plus"></i> Book Vehicle
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Expandable Booking Form Row -->
+              <tr *ngIf="expandedVehicleId === vehicle.id" class="booking-form-row">
+                <td colspan="5">
+                  <div class="booking-form-container p-3 bg-light">
+                    <h6 class="mb-3">Book Vehicle: {{ vehicle.vehicleRegNo }}</h6>
+                    <form [formGroup]="getBookingForm(vehicle.id)" (ngSubmit)="submitBooking(vehicle.id)">
+                      <div class="row">
+                        <!-- Booking Date -->
+                        <div class="col-md-3 mb-3">
+                          <label>Booking Date *</label>
+                          <input type="date" formControlName="bookingDate" class="form-control" />
+                          <div *ngIf="getBookingForm(vehicle.id).get('bookingDate')?.invalid && getBookingForm(vehicle.id).get('bookingDate')?.touched"
+                               class="text-danger mt-1">
+                            <small>Booking date is required</small>
+                          </div>
+                        </div>
+
+                        <!-- Started From -->
+                        <div class="col-md-3 mb-3">
+                          <label>Started From *</label>
+                          <input formControlName="startedFrom" class="form-control" placeholder="Enter starting location" />
+                          <div *ngIf="getBookingForm(vehicle.id).get('startedFrom')?.invalid && getBookingForm(vehicle.id).get('startedFrom')?.touched"
+                               class="text-danger mt-1">
+                            <small>Starting location is required</small>
+                          </div>
+                        </div>
+
+                        <!-- Destination -->
+                        <div class="col-md-3 mb-3">
+                          <label>Destination *</label>
+                          <input formControlName="destination" class="form-control" placeholder="Enter destination" />
+                          <div *ngIf="getBookingForm(vehicle.id).get('destination')?.invalid && getBookingForm(vehicle.id).get('destination')?.touched"
+                               class="text-danger mt-1">
+                            <small>Destination is required</small>
+                          </div>
+                        </div>
+
+                        <!-- Driver Name -->
+                        <div class="col-md-3 mb-3">
+                          <label>Driver Name</label>
+                          <input formControlName="driverName" class="form-control" placeholder="Enter driver name" />
+                        </div>
+
+                        <!-- Hire Amount -->
+                        <div class="col-md-3 mb-3">
+                          <label>Hire Amount *</label>
+                          <input type="number" formControlName="bookingHire" class="form-control" placeholder="Enter hire amount" />
+                          <div *ngIf="getBookingForm(vehicle.id).get('bookingHire')?.invalid && getBookingForm(vehicle.id).get('bookingHire')?.touched"
+                               class="text-danger mt-1">
+                            <small>Hire amount is required</small>
+                          </div>
+                        </div>
+
+                        <!-- Advance -->
+                        <div class="col-md-3 mb-3">
+                          <label>Advance</label>
+                          <input type="number" formControlName="bookingAdvance" class="form-control" placeholder="Enter advance amount" />
+                        </div>
+
+                        <!-- Balance -->
+                        <div class="col-md-3 mb-3">
+                          <label>Balance</label>
+                          <input type="number" formControlName="bookingBalance" class="form-control" placeholder="Remaining balance" />
+                        </div>
+
+                        <!-- Booking Received Date -->
+                        <div class="col-md-3 mb-3">
+                          <label>Booking Received Date</label>
+                          <input type="date" formControlName="bookingReceivedDate" class="form-control" />
+                        </div>
+
+                        <!-- Booking Status -->
+                        <div class="col-md-3 mb-3">
+                          <label>Booking Status *</label>
+                          <select formControlName="bookingStatus" class="form-control">
+                            <option value="" disabled selected>Select status</option>
+                            <option *ngFor="let status of bookingStatusOptions" [value]="status">{{ status }}</option>
+                          </select>
+                          <div *ngIf="getBookingForm(vehicle.id).get('bookingStatus')?.invalid && getBookingForm(vehicle.id).get('bookingStatus')?.touched"
+                               class="text-danger mt-1">
+                            <small>Booking status is required</small>
+                          </div>
+                        </div>
+
+                        <!-- Vehicle Status -->
+                        <div class="col-md-3 mb-3">
+                          <label>Vehicle Status *</label>
+                          <select formControlName="vehicleStatus" class="form-control">
+                            <option value="" disabled selected>Select status</option>
+                            <option *ngFor="let status of vehicleStatusOptions" [value]="status">{{ status }}</option>
+                          </select>
+                          <div *ngIf="getBookingForm(vehicle.id).get('vehicleStatus')?.invalid && getBookingForm(vehicle.id).get('vehicleStatus')?.touched"
+                               class="text-danger mt-1">
+                            <small>Vehicle status is required</small>
+                          </div>
+                        </div>
+
+                        <!-- Detain Info -->
+                        <div class="col-md-3 mb-3">
+                          <label>Detain Info</label>
+                          <input formControlName="detain" class="form-control" placeholder="Enter detain details" />
+                        </div>
+
+                        <!-- POD Received -->
+                        <div class="col-md-3 mb-3">
+                          <label>POD Received</label>
+                          <select formControlName="podReceived" class="form-control">
+                            <option value="" disabled selected>Select POD status</option>
+                            <option [ngValue]="true">Yes</option>
+                            <option [ngValue]="false">No</option>
+                          </select>
+                        </div>
+
+                        <!-- POD Document -->
+                        <div class="col-md-6 mb-3">
+                          <label>POD Document</label>
+                          <input formControlName="podDocument" class="form-control" placeholder="Enter POD document name or link" />
+                        </div>
+
+                        <!-- Lorry Balance Paid Date -->
+                        <div class="col-md-6 mb-3">
+                          <label>Lorry Balance Paid Date</label>
+                          <input type="date" formControlName="lorryBalancePaidDate" class="form-control" />
+                        </div>
+                      </div>
+
+                      <!-- Form Actions -->
+                      <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-success me-2" [disabled]="getBookingForm(vehicle.id).invalid">
+                          <i class="fa fa-check"></i> Book Vehicle
+                        </button>
+                        <button type="button" class="btn btn-secondary" (click)="cancelBooking(vehicle.id)">
+                          <i class="fa fa-times"></i> Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Vehicles Message -->
+      <div *ngIf="!loadingVehicles && allVehicles.length === 0" class="text-center py-5">
+        <h5>No vehicles found</h5>
+        <p class="text-muted">No vehicles are currently available in the system.</p>
+      </div>
+    </div>
+  </div>
+</div>
