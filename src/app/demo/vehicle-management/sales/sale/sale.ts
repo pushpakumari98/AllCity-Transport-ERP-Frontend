@@ -25,7 +25,7 @@ export class SaleComponent implements OnInit {
   constructor(private fb: FormBuilder, private saleService: SaleService, private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar, // private notificationService: NotificationService
   ) {
     this.saleForm = this.fb.group({
-      vehicleRefId: [1, Validators.required], // Temporary - should come from vehicle selection
+      vehicleId: ['', Validators.required], // Should come from vehicle selection
       date: ['', Validators.required],
       lorryNumber: ['', Validators.required],  //lorryNumber
       weight: [0, [Validators.required, Validators.min(1)]],
@@ -120,4 +120,5 @@ export class SaleComponent implements OnInit {
     this.router.navigate(['/app/vehicle-sales-list']);
   }
 }
+
 
