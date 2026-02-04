@@ -98,3 +98,4 @@ export class VehicleService {
     return this.http.delete<any>(`${this.vehiclesUrl}/delete/${id}`, { headers: this.getHeaders() });
   }
 }
+
