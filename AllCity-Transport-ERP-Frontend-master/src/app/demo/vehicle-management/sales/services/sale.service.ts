@@ -11,11 +11,25 @@ export class SaleService {
   constructor(private http: HttpClient) {}
 
   // ================= ADD SALE (DB) =================
-  addSale(sale: VehicleSale): Observable<VehicleSale> {
-    const formData = new FormData();
-    formData.append('data', new Blob([JSON.stringify(sale)], { type: 'application/json' }));
-    return this.http.post<VehicleSale>(this.apiUrl, formData);
+ addSale(data: any, document?: File) {
+  const formData = new FormData();
+
+  // backend expects "data"
+  formData.append(
+    'data',
+    new Blob([JSON.stringify(data)], { type: 'application/json' })
+  );
+
+  // optional file
+  if (document) {
+    formData.append('document', document);
   }
+
+  return this.http.post(
+    `${this.apiUrl}/vehicle-sales`,
+    formData
+  );
+}
 
   // ================= GET ALL SALES (DB) =================
   getAllSales(): Observable<VehicleSale[]> {
@@ -23,7 +37,7 @@ export class SaleService {
   }
 
   // ================= UPDATE SALE (DB) =================
-  updateSale(sale: VehicleSale): Observable<VehicleSale> {
+  updateSale(editingSaleId: number, sale: VehicleSale): Observable<VehicleSale> {
     return this.http.put<VehicleSale>(
       `${this.apiUrl}/${sale.id}`,
       sale

@@ -10,4 +10,5 @@ export interface VehicleSale {
   paymentMode: string;
   petrolPump: string;
   totalAdvance: number;
+  vehicleRefId: number;
 }
