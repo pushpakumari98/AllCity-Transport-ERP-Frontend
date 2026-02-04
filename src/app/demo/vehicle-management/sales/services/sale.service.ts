@@ -12,7 +12,9 @@ export class SaleService {
 
   // ================= ADD SALE (DB) =================
   addSale(sale: VehicleSale): Observable<VehicleSale> {
-    return this.http.post<VehicleSale>(this.apiUrl, sale);
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify(sale)], { type: 'application/json' }));
+    return this.http.post<VehicleSale>(this.apiUrl, formData);
   }
 
   // ================= GET ALL SALES (DB) =================
@@ -35,3 +37,4 @@ export class SaleService {
     );
   }
 }
+
