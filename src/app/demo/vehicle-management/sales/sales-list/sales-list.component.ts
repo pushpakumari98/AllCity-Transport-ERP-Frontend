@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { SaleService } from '../services/sale.service';
-import { VehicleSale } from '../models/vehicle-sale.model';
+import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationDialogComponent } from '../../../admin-management/confirmation-dialog/confirmation-dialog.component';
+import { VehicleSale } from '../models/vehicle-sale.model';
 import { SaleModalComponent } from '../sale-modal/sale-modal.component';
+import { SaleService } from '../services/sale.service';
 
 @Component({
   selector: 'app-sales-list',
@@ -47,48 +47,16 @@ export class SalesListComponent implements OnInit {
       },
       error: (err) => {
         console.error("Error fetching sales:", err);
-        // Load mock data for demonstration when backend is not available
-        this.loadMockData();
+        this.sales = [];
         this.loading = false;
-        this.snackBar.open('Loaded sample sales data for demonstration', '', {
-          duration: 3000,
-          verticalPosition: 'top',
-          horizontalPosition: 'center'
+        this.snackBar.open('Failed to load sales data. Please check backend connection.', 'Close', {
+          duration: 3000
         });
       }
     });
   }
 
-  private loadMockData() {
-    this.sales = [
-      {
-        id: 1,
-        vehicleId: "V001",
-        date: "2025-12-01",
-        lorryNumber: "LN001",
-        weight: 500.50,
-        lorryHire: 1000.00,
-        commission: 50.00,
-        bility: 100.00,
-        paymentMode: "UPI",
-        petrolPump: "ABC Petrol",
-        totalAdvance: 500.00
-      },
-      {
-        id: 2,
-        vehicleId: "V002",
-        date: "2025-12-02",
-        lorryNumber: "LN002",
-        weight: 750.25,
-        lorryHire: 1500.00,
-        commission: 75.00,
-        bility: 150.00,
-        paymentMode: "IMPS",
-        petrolPump: "XYZ Fuel",
-        totalAdvance: 750.00
-      }
-    ];
-  }
+
 
   addSale() {
     // Navigate to the dedicated sale form page
@@ -268,3 +236,4 @@ export class SalesListComponent implements OnInit {
     this.sales = [...this.sales]; // Trigger change detection
   }
 }
+
