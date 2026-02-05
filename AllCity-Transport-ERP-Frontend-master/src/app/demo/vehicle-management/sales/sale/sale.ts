@@ -40,19 +40,19 @@ export class SaleComponent implements OnInit {
   }
 
   private initForm(): void {
-    this.saleForm = this.fb.group({
-      vehicleId: [''],
-      date: ['', Validators.required],
-      lorryNumber: ['', Validators.required],
-      weight: [null, Validators.min(0.01)],
-      lorryHire: [null, Validators.min(0.01)],
-      commission: [0, Validators.min(0)],
-      bility: [0, Validators.min(0)],
-      paymentMode: ['UPI', Validators.required],
-      petrolPump: [''],
-      totalAdvance: [0, Validators.min(0)],
-      vehicleRefId: [null, Validators.required]
-    });
+ this.saleForm = this.fb.group({
+  vehicleRefId: [null, Validators.required],
+  vehicleId: [''],
+  date: ['', Validators.required],
+  lorryNumber: ['', Validators.required],
+  weight: [null, [Validators.required, Validators.min(0.01)]],
+  lorryHire: [null, [Validators.required, Validators.min(0.01)]],
+  commission: [0, Validators.min(0)],
+  bility: [0, Validators.min(0)],
+  paymentMode: ['UPI', Validators.required],
+  petrolPump: [''],
+  totalAdvance: [0, Validators.min(0)]
+});
   }
 
   onSubmit(): void {
@@ -76,7 +76,13 @@ export class SaleComponent implements OnInit {
     request$.subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.saleForm.reset();
+        this.saleForm.reset({
+  paymentMode: 'UPI',
+  commission: 0,
+  bility: 0,
+  totalAdvance: 0
+});
+
         this.saleForm.markAsPristine();
         this.saleForm.markAsUntouched();
         this.snackBar.open(
