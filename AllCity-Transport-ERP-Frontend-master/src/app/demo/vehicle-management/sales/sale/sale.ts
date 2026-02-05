@@ -18,6 +18,7 @@ export class SaleComponent implements OnInit {
   saleForm!: FormGroup;
   isEditMode = false;
   editingSaleId!: number;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -64,6 +65,8 @@ export class SaleComponent implements OnInit {
       return;
     }
 
+    this.isSubmitting = true;
+
     const saleData = this.saleForm.value;
 
     const request$ = this.isEditMode
@@ -72,6 +75,10 @@ export class SaleComponent implements OnInit {
 
     request$.subscribe({
       next: () => {
+        this.isSubmitting = false;
+        this.saleForm.reset();
+        this.saleForm.markAsPristine();
+        this.saleForm.markAsUntouched();
         this.snackBar.open(
           this.isEditMode
             ? 'Sale updated successfully!'
@@ -79,9 +86,12 @@ export class SaleComponent implements OnInit {
           'Close',
           { duration: 3000 }
         );
-        this.router.navigate(['/app/vehicle-sales-reports']);
+        setTimeout(() => {
+          this.router.navigate(['/app/vehicle-sales-reports']);
+        }, 500);
       },
       error: (err) => {
+        this.isSubmitting = false;
         console.error(err);
         this.snackBar.open(
           'Failed to save sale',
