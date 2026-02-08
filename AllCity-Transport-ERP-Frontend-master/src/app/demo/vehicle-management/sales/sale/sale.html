@@ -15,12 +15,10 @@
 
         <div class="row g-3">
           <div class="col-md-4">
-            <label>Vehicle Reference ID *</label>
-            const saleData = {
-...this.saleForm.value,
-  vehicleRefId: Number(this.saleForm.value.vehicleRefId)
-};
- class="form-control" placeholder="Enter Vehicle Reference ID"
+            <input type="number"
+  formControlName="vehicleRefId"
+  class="form-control"
+  placeholder="Enter Vehicle Reference ID"
                    [class.is-invalid]="saleForm.get('vehicleRefId')?.invalid && saleForm.get('vehicleRefId')?.touched" />
             <div class="invalid-feedback" *ngIf="saleForm.get('vehicleRefId')?.invalid && saleForm.get('vehicleRefId')?.touched">
               Vehicle Reference ID is required
