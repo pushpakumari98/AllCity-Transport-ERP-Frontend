@@ -13,22 +13,9 @@
     <div class="card-body">
       <form [formGroup]="saleForm" (ngSubmit)="onSubmit()">
 
-        <div class="row g-3">
-          <div class="col-md-4">
-            <input type="number"
-  formControlName="vehicleRefId"
-  class="form-control"
-  placeholder="Enter Vehicle Reference ID"
-                   [class.is-invalid]="saleForm.get('vehicleRefId')?.invalid && saleForm.get('vehicleRefId')?.touched" />
-            <div class="invalid-feedback" *ngIf="saleForm.get('vehicleRefId')?.invalid && saleForm.get('vehicleRefId')?.touched">
-              Vehicle Reference ID is required
-            </div>
-          </div>
-
-          <div class="col-md-4">
-            <label>Vehicle ID</label>
-            <input formControlName="vehicleId" class="form-control" placeholder="Auto-generated if empty" readonly />
-          </div>
+          <input formControlName="vehicleId"
+           class="form-control"
+           placeholder="Enter Vehicle ID" />
 
           <div class="col-md-4">
             <label>Date *</label>

@@ -25,7 +25,7 @@ export class SaleModalComponent implements OnInit, OnChanges {
 
   saleForm!: FormGroup;
 
-  paymentModes = ['UPI', 'IMPS', 'CASH', 'NETBANKING', 'CREDIT CARD', 'DEBIT CARD'];
+  paymentModes = ['UPI', 'IMPS', 'CASH', 'NETBANKING', 'CREDIT_CARD', 'DEBIT_CARD'];
 
   constructor(private fb: FormBuilder, private saleService: SaleService, private snackBar: MatSnackBar) {}
 
@@ -45,16 +45,16 @@ export class SaleModalComponent implements OnInit, OnChanges {
 
   private initializeForm() {
     this.saleForm = this.fb.group({
-      vehicleId: ['', Validators.required],
-      date: ['', Validators.required],
-      lorryNumber: ['', Validators.required],
-      weight: [0, [Validators.required, Validators.min(0.01)]],
-      lorryHire: [0, [Validators.required, Validators.min(0.01)]],
-      commission: [0, [Validators.required, Validators.min(0)]],
-      bility: [0, [Validators.required, Validators.min(0)]],
-      paymentMode: ['UPI', Validators.required],
-      petrolPump: [''],
-      totalAdvance: [0, [Validators.required, Validators.min(0)]]
+     vehicleId: ['', Validators.required],
+  date: ['', Validators.required],
+  lorryNumber: ['', Validators.required],
+  weight: [null, [Validators.required, Validators.min(0.01)]],
+  lorryHire: [null, [Validators.required, Validators.min(0.01)]],
+  commission: [0, Validators.min(0)],
+  bility: [0, Validators.min(0)],
+  paymentMode: ['UPI', Validators.required],
+  petrolPump: [''],
+  totalAdvance: [0, Validators.min(0)]
     });
   }
 
@@ -64,7 +64,7 @@ export class SaleModalComponent implements OnInit, OnChanges {
     const payload = this.saleForm.value;
     const saleData = this.editMode ? { ...this.saleData, ...payload } : { ...payload, id: Date.now() };
     const observable = this.editMode
-      ? this.saleService.updateSale(saleData)
+      ? this.saleService.updateSale(this.saleData.id, saleData)
       : this.saleService.addSale(saleData);
 
     const action = this.editMode ? 'updated' : 'saved';

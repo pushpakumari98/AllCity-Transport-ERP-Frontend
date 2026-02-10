@@ -40,9 +40,8 @@ export class SaleComponent implements OnInit {
   }
 
   private initForm(): void {
- this.saleForm = this.fb.group({
-  vehicleRefId: [null, Validators.required],
-  vehicleId: [''],
+this.saleForm = this.fb.group({
+  vehicleId: ['', Validators.required],
   date: ['', Validators.required],
   lorryNumber: ['', Validators.required],
   weight: [null, [Validators.required, Validators.min(0.01)]],
