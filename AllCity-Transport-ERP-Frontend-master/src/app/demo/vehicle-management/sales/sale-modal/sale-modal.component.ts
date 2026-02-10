@@ -61,7 +61,7 @@ export class SaleModalComponent implements OnInit, OnChanges {
     if (this.saleForm.invalid) return;
 
     const payload = this.saleForm.value;
-    const saleData = this.editMode ? { ...this.saleData, ...payload } : { ...payload, id: Date.now() };
+    const saleData = this.editMode ? { ...this.saleData, ...payload } : payload;
     const observable = this.editMode
       ? this.saleService.updateSale(this.saleData.id, saleData)
       : this.saleService.addSale(saleData);
