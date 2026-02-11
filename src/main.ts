@@ -1,5 +1,5 @@
 import { enableProdMode, importProvidersFrom } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -7,7 +7,7 @@ import { environment } from './environments/environment';
 
 import { AppRoutingModule } from './app/app-routing.module';
 import { AppComponent } from './app/app.component';
-import { AuthInterceptor } from './app/shared/interceptors/auth.interceptor';
+import { authInterceptor } from './app/shared/interceptors/auth.interceptor';
 
 if (environment.production) {
   enableProdMode();
@@ -15,13 +15,9 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(BrowserModule, AppRoutingModule, HttpClientModule),
-    provideAnimations(),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }
+    importProvidersFrom(BrowserModule, AppRoutingModule),
+    provideHttpClient(withInterceptors([authInterceptor])),
+    provideAnimations()
   ],
 
 }).catch((err) => console.error(err));
