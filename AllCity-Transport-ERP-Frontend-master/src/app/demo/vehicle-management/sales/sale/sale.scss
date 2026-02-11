@@ -48,6 +48,13 @@
   padding: 10px;
   font-size: 1rem;
   border-radius: 4px;
+  background-color: #1e3a8a !important;
+  border-color: #1e3a8a !important;
+}
+
+.btn-primary:hover {
+  background-color: #172554 !important;
+  border-color: #172554 !important;
 }
 
 /* Make form horizontally structured and wide */
@@ -68,3 +75,5 @@
 label {
   font-weight: 500;
 }
+
+
